@@ -63,16 +63,29 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	// open the first web page openPage.html
 	//openpage := template.Must(template.ParseFiles("template/connexion.html"))
 	var userconnect user
+	var booleanName bool
 	if r.Method == "POST" {
-		Email := r.FormValue("usermailconn")
+		Pseudo := r.FormValue("username")
 		Password := r.FormValue("pwdconn")
-		userconnect.email = Email
+		userconnect.username = Pseudo
 		userconnect.pwd = Password
-		booleanUser, _ := VerifieUser(userconnect.email, db)
-		booleanPwd, _ := VerifiePwd(userconnect.email, userconnect.pwd, db)
+		booleanUser, err := VerifieEmail(userconnect.username, db)
+		if err != nil {
+			fmt.Println("user:", err)
+		}
+		booleanPwd, err := VerifiePwd(userconnect.username, userconnect.pwd, db)
+		if err != nil {
+			fmt.Println("pwd:", err)
+		}
+		if !booleanUser {
+			booleanName, err = VerifieName(Pseudo, db)
+			if err != nil {
+				fmt.Println("name:", err)
+			}
+		}
 		if !booleanPwd {
 			fmt.Println("this password is  wrong")
-		} else if booleanUser {
+		} else if booleanUser || booleanName {
 			//http.Redirect(w, r, "/compte", http.StatusSeeOther)
 		} else {
 			fmt.Println("this compte does not exist")
@@ -89,13 +102,23 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 	var userToAdd user
 	if r.Method == "POST" {
 		newEmail := r.FormValue("usermail")
+		newUserName := r.FormValue("username")
 		newPwd := r.FormValue("pwd")
 		newPwd2 := r.FormValue("pwd2")
-		booleanUser, _ := VerifieUser(newEmail, db)
+		booleanEmail, err := VerifieEmail(newEmail, db)
+		if err != nil {
+			fmt.Println("email:", err)
+		}
+		booleanName, err := VerifieName(newUserName, db)
+		if err != nil {
+			fmt.Println("name:", err)
+		}
 		if newPwd != newPwd2 {
 			fmt.Println("the password are not equal")
-		} else if booleanUser {
+		} else if booleanEmail {
 			fmt.Println("this user already exist")
+		} else if booleanName {
+			fmt.Println("this name is already used")
 		} else {
 			userToAdd.email = newEmail
 			userToAdd.pwd, _ = HashPassword(newPwd)
@@ -111,7 +134,7 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 	//openpage.Execute(w, users)
 }
 
-func VerifieUser(Email string, db *sql.DB) (bool, error) {
+func VerifieEmail(Email string, db *sql.DB) (bool, error) {
 	var tableUser []string
 	Globaluser, err := db.Query("SELECT * FROM user WHERE email=?", Email)
 	if err != nil {
@@ -130,6 +153,31 @@ func VerifieUser(Email string, db *sql.DB) (bool, error) {
 	}
 	for i := range tableUser {
 		if tableUser[i] == Email {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func VerifieName(Name string, db *sql.DB) (bool, error) {
+	var tableUser []string
+	Globaluser, err := db.Query("SELECT * FROM user WHERE username=?", Name)
+	if err != nil {
+		fmt.Println("error in hash")
+	}
+	defer Globaluser.Close()
+	for Globaluser.Next() {
+		var trueUser user
+		if err := Globaluser.Scan(&trueUser.username, &trueUser.email, &trueUser.pwd); err != nil {
+			return false, err
+		}
+		tableUser = append(tableUser, trueUser.username)
+	}
+	if err = Globaluser.Err(); err != nil {
+		return false, err
+	}
+	for i := range tableUser {
+		if tableUser[i] == Name {
 			return true, nil
 		}
 	}
