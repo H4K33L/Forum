@@ -21,7 +21,7 @@ type user struct {
 //var users user
 
 func OpenDb() *sql.DB {
-	db, err := sql.Open("sqlite3", "./database.db")
+	db, err := sql.Open("sqlite3", "../DATA/User_data.db")
 	if err != nil {
 		log.Fatal(err)
 	}
