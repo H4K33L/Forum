@@ -1,8 +1,8 @@
-module main
+module authentification
 
-go 1.21.6
+go 1.21
 
 require (
-	github.com/mattn/go-sqlite3 v1.14.19 // direct
-	golang.org/x/crypto v0.17.0 // direct
+	github.com/mattn/go-sqlite3 v1.14.22
+	golang.org/x/crypto v0.23.0
 )
