@@ -79,14 +79,14 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	var userconnect user
 	if r.Method == "POST" {
 		userconnect.email = r.FormValue("usermailconn")
+		userconnect.username = r.FormValue("usermailconn")
 		userconnect.pwd = r.FormValue("pwdconn")
 		booleanUser, err := VerifieEmail(userconnect.email, db)
 		if err != nil {
 			fmt.Print("conn email ")
 			log.Fatal(err)
 		}
-
-		booleanName, err2 := VerifieName(userconnect.email, db)
+		booleanName, err2 := VerifieName(userconnect.username, db)
 		if err2 != nil {
 			fmt.Print("conn name ")
 			log.Fatal(err2)
@@ -99,6 +99,17 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 		if !booleanPwd {
 			fmt.Println("this password is  wrong:", userconnect.pwd)
 		} else if booleanUser || booleanName {
+			cookieName := &http.Cookie{
+				Name:  "username",
+				Value: userconnect.username,
+			}
+			http.SetCookie(w, cookieName)
+			cookiePwd := &http.Cookie{
+				Name:  "Pwd",
+				Value: userconnect.pwd,
+			}
+
+			http.SetCookie(w, cookiePwd)
 			http.Redirect(w, r, "/compte", http.StatusSeeOther)
 		} else {
 			fmt.Println("this compte does not exist")
@@ -133,6 +144,17 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			userToAdd.pwd, _ = HashPassword(newPwd)
 			errors := Adduser(db, userToAdd)
 			if errors == "" {
+				cookieName := &http.Cookie{
+					Name:  "username",
+					Value: userToAdd.username,
+				}
+				http.SetCookie(w, cookieName)
+				cookiePwd := &http.Cookie{
+					Name:  "Pwd",
+					Value: userToAdd.pwd,
+				}
+
+				http.SetCookie(w, cookiePwd)
 				http.Redirect(w, r, "/compte", http.StatusSeeOther)
 			} else {
 				fmt.Println("error in adduser")
