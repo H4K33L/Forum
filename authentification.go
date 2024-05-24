@@ -55,7 +55,7 @@ func Accueil(w http.ResponseWriter, r *http.Request) {
 }
 func Compte(w http.ResponseWriter, r *http.Request) {
 	// open the first web page openPage.html
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/connection.html"))
+	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
 	// execute the modification of the page
 	openpage.Execute(w, users)
 }

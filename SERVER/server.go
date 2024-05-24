@@ -8,9 +8,6 @@ import (
 	"net/http"
 )
 
-// tmpl is an HTML template for displaying data.
-//var tmpl = template.Must(template.ParseFiles("VIEWS/html/connection.html"))
-
 // main is the main function of the program.
 func main() {
 	db := authentification.OpenDb("../DATA/User_data.db")
@@ -32,6 +29,7 @@ func main() {
 	})
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
+		authentification.UserPost(w,r)
 	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
