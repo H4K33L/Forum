@@ -1,29 +1,30 @@
-package client
+package authentification
 
 import (
 	"database/sql"
 	"strings"
 
 	//"html/template"
-	"log"
 	"fmt"
+	"log"
+	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type post struct {
-	username 	string
-	message    	string
-	image	    string
-	date		string
-	like 		int
-	dislike		int
-	chanel		[]string
-	target		[]string
-	answers 	[]string
+	username string
+	message  string
+	image    string
+	date     string
+	like     int
+	dislike  int
+	chanel   []string
+	target   []string
+	answers  []string
 }
 
-func InitDbpost(db *sql.DB) bool {
+func InitDbpost(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS post
 	(
 	id INT NOT NULL UNIQUE,
@@ -41,9 +42,6 @@ func InitDbpost(db *sql.DB) bool {
 	_, dberr := db.Exec(table)
 	if dberr != nil {
 		log.Fatal(dberr.Error())
-		return false
-	} else {
-		return true
 	}
 }
 
@@ -53,6 +51,20 @@ func convertToString(array []string) string {
 
 func convertToArray(str string) []string {
 	return strings.Split(str, "|\\/|-_-|\\/|+{}")
+}
+
+func UserPost(w http.ResponseWriter, r *http.Request) {
+	var post post
+	if r.Method == "POST" {
+		post.username = r.FormValue("username")
+		post.message = r.FormValue("message")
+		post.image = r.FormValue("image")
+		post.date = r.FormValue("date")
+		post.chanel = strings.Split(r.FormValue("chanel"), "R/")
+		post.target = strings.Split(r.FormValue("target"), " \\ ")
+		InitDbpost(OpenDb("../DATA/User_data.db"))
+		AddPost(OpenDb("../DATA/User_data.db"), post)
+	}
 }
 
 func AddPost(db *sql.DB, post post) bool {
@@ -70,6 +82,7 @@ func AddPost(db *sql.DB, post post) bool {
 	return true
 }
 
+/*
 func getPost(db *sql.DB, username string, chanels []string) (bool, []post) {
 	output := []post{}
 	UserPost, err := db.Query("SELECT * FROM post WHERE username=?", username)
@@ -110,3 +123,4 @@ func contains(s []string, str string) bool {
 
     return false
 }
+*/
