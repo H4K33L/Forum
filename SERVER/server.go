@@ -32,6 +32,7 @@ func main() {
 	})
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
+		authentification.UserPost(w, r)
 	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
