@@ -8,9 +8,6 @@ import (
 	"net/http"
 )
 
-// tmpl is an HTML template for displaying data.
-//var tmpl = template.Must(template.ParseFiles("VIEWS/html/connection.html"))
-
 // main is the main function of the program.
 func main() {
 	db := authentification.OpenDb("../DATA/User_data.db")
