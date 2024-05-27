@@ -15,6 +15,7 @@ import (
 func main() {
 	db := authentification.OpenDb("../DATA/User_data.db")
 	authentification.InitDb(db)
+	authentification.InitDbProfile(db)
 	defer db.Close()
 	fmt.Println("server successfully up, go to http://localhost:8080")
 
@@ -33,6 +34,9 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
+	})
+	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
+		authentification.Profile(w, r)
 	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)

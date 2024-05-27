@@ -39,7 +39,8 @@ func InitDb(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS user (
 				email VARCHAR(80) NOT NULL UNIQUE,
 				username VARCHAR(80) NOT NULL UNIQUE,
-				pwd VARCHAR(80) NOT NULL
+				pwd VARCHAR(80) NOT NULL,
+				PRIMARY KEY (username, pwd)
 			);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
@@ -50,12 +51,25 @@ func InitDb(db *sql.DB) {
 func Accueil(w http.ResponseWriter, r *http.Request) {
 	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/accueil.html"))
+	var cookieName, cookiePwd *http.Cookie
+	cookieName = &http.Cookie{
+		Name:  "Username",
+		Value: "",
+	}
+	http.SetCookie(w, cookieName)
+	cookiePwd = &http.Cookie{
+		Name:  "Pwd",
+		Value: "",
+	}
+	http.SetCookie(w, cookiePwd)
 	// execute the modification of the page
 	openpage.Execute(w, users)
 }
 func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
 	InitDbpost(db)
+	defer db.Close()
+	createProfile(w, r)
 	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
 	// execute the modification of the page
@@ -68,7 +82,6 @@ func Adduser(db *sql.DB, user user) string {
 		fmt.Println(err)
 		return "error Prepare new user"
 	}
-	fmt.Println(user.email)
 	statement.Exec(user.email, user.username, user.pwd)
 	defer db.Close()
 	return ""
@@ -80,37 +93,52 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/connexion.html"))
 	var userconnect user
 	if r.Method == "POST" {
+		var err error
+		var cookieName, cookiePwd *http.Cookie
+		cookiePwd, err = r.Cookie("Pwd")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// Si le cookie n'existe pas
+				log.Fatal("Cookie pwd connexion not found")
+			}
+			log.Fatal("Error retrieving cookie:", err)
+		}
+		cookieName, err = r.Cookie("Username")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// Si le cookie n'existe pas
+				log.Fatal("Cookie username connexion not found")
+			}
+			log.Fatal("Error retrieving cookie:", err)
+		}
+
 		userconnect.email = r.FormValue("usermailconn")
 		userconnect.username = r.FormValue("usermailconn")
 		userconnect.pwd = r.FormValue("pwdconn")
 		booleanUser, err := VerifieEmail(userconnect.email, db)
 		if err != nil {
-			fmt.Print("conn email ")
-			log.Fatal(err)
+			log.Fatal("conn email ", err)
 		}
 		booleanName, err2 := VerifieName(userconnect.username, db)
 		if err2 != nil {
-			fmt.Print("conn name ")
-			log.Fatal(err2)
+			log.Fatal("conn name ", err2)
 		}
 		booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
 		if err1 != nil {
-			fmt.Print("conn pwd ")
-			log.Fatal(err1)
+			log.Fatal("conn pwd ", err1)
 		}
 		if !booleanPwd {
 			fmt.Println("this password is  wrong:", userconnect.pwd)
 		} else if booleanUser || booleanName {
-			cookieName := &http.Cookie{
-				Name:  "username",
+			cookieName = &http.Cookie{
+				Name:  "Username",
 				Value: userconnect.username,
 			}
 			http.SetCookie(w, cookieName)
-			cookiePwd := &http.Cookie{
+			cookiePwd = &http.Cookie{
 				Name:  "Pwd",
 				Value: userconnect.pwd,
 			}
-
 			http.SetCookie(w, cookiePwd)
 			http.Redirect(w, r, "/compte", http.StatusSeeOther)
 		} else {
@@ -126,7 +154,6 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/inscription.html"))
 	var userToAdd user
-	fmt.Println("iscription1")
 	if r.Method == "POST" {
 		newEmail := r.FormValue("usermail")
 		newUserName := r.FormValue("username")
@@ -147,13 +174,13 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			errors := Adduser(db, userToAdd)
 			if errors == "" {
 				cookieName := &http.Cookie{
-					Name:  "username",
+					Name:  "Username",
 					Value: userToAdd.username,
 				}
 				http.SetCookie(w, cookieName)
 				cookiePwd := &http.Cookie{
 					Name:  "Pwd",
-					Value: userToAdd.pwd,
+					Value: r.FormValue("pwd"),
 				}
 
 				http.SetCookie(w, cookiePwd)
@@ -200,6 +227,7 @@ func VerifiePwd(Input string, Password string, db *sql.DB) (bool, error) {
 	}
 	return CheckPasswordHash(Password, hashedPwd), nil
 }
+
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
