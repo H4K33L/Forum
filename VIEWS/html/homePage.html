@@ -18,6 +18,20 @@
             <input type="text" name="target" placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
             <input type="submit" value="Se connecter">
         </form>
+        <form method="GET">
+            <input type="text" name="username" placeholder="Entrer un nom d'utilisateur">
+            <input type="text" name="chanels" placeholder="Entrer un chanel">
+            <input type="submit" value="Find Post">
+        </form>
     </main>
+    <content>
+        {{range .}}
+        <p>{{ .date }}</p>
+            <img src="{{ .image }}" >
+            <h3>{{ .message }}</h3>
+            <p>like : {{.like}}</p>
+            <p>dislike : {{.dislike}}</p>
+        {{ end }}
+    </content>
 </body>
 </html>
