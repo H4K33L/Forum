@@ -63,7 +63,6 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.date = r.FormValue("date")
 		post.chanel = strings.Split(r.FormValue("chanel"), "R/")
 		post.target = strings.Split(r.FormValue("target"), " \\ ")
-		InitDbpost(OpenDb("../DATA/User_data.db")) 
 		AddPost(OpenDb("../DATA/User_data.db"),post)
 	}
 }
