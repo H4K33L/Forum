@@ -58,7 +58,6 @@ func Compte(w http.ResponseWriter, r *http.Request) {
 	InitDbpost(db)
 	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
 	// execute the modification of the page
 	openpage.Execute(w, users)
 }
