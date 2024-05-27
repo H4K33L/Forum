@@ -2,28 +2,27 @@ package authentification
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
-
 )
 
 type post struct {
-	username 	string
-	message    	string
-	image	    string
-	date		string
-	like 		int
-	dislike		int
-	chanel		[]string
-	target		[]string
-	answers 	[]string
+	username string
+	message  string
+	image    string
+	date     string
+	like     int
+	dislike  int
+	chanel   []string
+	target   []string
+	answers  []string
 }
 
 func InitDbpost(db *sql.DB) {
@@ -49,24 +48,24 @@ func InitDbpost(db *sql.DB) {
 
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	var post post
-	if r.Method == "POST" { 
-		username, err := r.Cookie("username")
-    	if err != nil {
-        	if err == http.ErrNoCookie {
-            	// Si le cookie n'existe pas
-            	log.Fatal("Cookie username not found")
-        	}
-        	// Autre erreur
-            log.Fatal("Error retrieving cookie:", err)
+	if r.Method == "POST" {
+		username, err := r.Cookie("Username")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// Si le cookie n'existe pas
+				log.Fatal("Cookie username not found")
+			}
+			// Autre erreur
+			log.Fatal("Error retrieving cookie:", err)
 		}
 		post.username = username.Value
 		post.message = r.FormValue("message")
 		post.image = r.FormValue("image")
 		then := time.Now()
-		post.date = strconv.Itoa(then.Year())+"/"+then.Month().String()+"/"+strconv.Itoa(then.Day())+"/"+strconv.Itoa(then.Hour())+"/"+strconv.Itoa(then.Minute())+"/"+strconv.Itoa(then.Second())
+		post.date = strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
 		post.chanel = strings.Split(r.FormValue("chanel"), "R/")
 		post.target = strings.Split(r.FormValue("target"), "\\\\")
-		AddPost(OpenDb("../DATA/User_data.db"),post)
+		AddPost(OpenDb("../DATA/User_data.db"), post)
 	}
 }
 

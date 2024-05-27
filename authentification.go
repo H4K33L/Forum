@@ -18,10 +18,6 @@ type user struct {
 	pwd      string
 }
 
-/*
-pp VARCHAR(80),
-follow VARCHAR(80)
-*/
 var users user
 
 func OpenDb(path string) *sql.DB {
@@ -49,30 +45,15 @@ func InitDb(db *sql.DB) {
 }
 
 func Accueil(w http.ResponseWriter, r *http.Request) {
-	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/accueil.html"))
-	var cookieName, cookiePwd *http.Cookie
-	cookieName = &http.Cookie{
-		Name:  "Username",
-		Value: "",
-	}
-	http.SetCookie(w, cookieName)
-	cookiePwd = &http.Cookie{
-		Name:  "Pwd",
-		Value: "",
-	}
-	http.SetCookie(w, cookiePwd)
-	// execute the modification of the page
 	openpage.Execute(w, users)
 }
+
 func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
-	InitDbpost(db)
+	InitDb(db)
 	defer db.Close()
-	createProfile(w, r)
-	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
-	// execute the modification of the page
 	openpage.Execute(w, users)
 }
 
@@ -83,38 +64,21 @@ func Adduser(db *sql.DB, user user) string {
 		return "error Prepare new user"
 	}
 	statement.Exec(user.email, user.username, user.pwd)
-	defer db.Close()
 	return ""
 }
 
 func Connexion(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
-	// open the first web page openPage.html
+	defer db.Close()
+
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/connexion.html"))
 	var userconnect user
-	if r.Method == "POST" {
-		var err error
-		var cookieName, cookiePwd *http.Cookie
-		cookiePwd, err = r.Cookie("Pwd")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				// Si le cookie n'existe pas
-				log.Fatal("Cookie pwd connexion not found")
-			}
-			log.Fatal("Error retrieving cookie:", err)
-		}
-		cookieName, err = r.Cookie("Username")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				// Si le cookie n'existe pas
-				log.Fatal("Cookie username connexion not found")
-			}
-			log.Fatal("Error retrieving cookie:", err)
-		}
 
+	if r.Method == "POST" {
 		userconnect.email = r.FormValue("usermailconn")
 		userconnect.username = r.FormValue("usermailconn")
 		userconnect.pwd = r.FormValue("pwdconn")
+
 		booleanUser, err := VerifieEmail(userconnect.email, db)
 		if err != nil {
 			log.Fatal("conn email ", err)
@@ -127,44 +91,51 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 		if err1 != nil {
 			log.Fatal("conn pwd ", err1)
 		}
+
 		if !booleanPwd {
-			fmt.Println("this password is  wrong:", userconnect.pwd)
+			fmt.Println("this password is wrong:", userconnect.pwd)
 		} else if booleanUser || booleanName {
-			cookieName = &http.Cookie{
+			cookieName := &http.Cookie{
 				Name:  "Username",
 				Value: userconnect.username,
+				Path:  "/",
 			}
 			http.SetCookie(w, cookieName)
-			cookiePwd = &http.Cookie{
+			cookiePwd := &http.Cookie{
 				Name:  "Pwd",
 				Value: userconnect.pwd,
+				Path:  "/",
 			}
 			http.SetCookie(w, cookiePwd)
 			http.Redirect(w, r, "/compte", http.StatusSeeOther)
+			return
 		} else {
-			fmt.Println("this compte does not exist")
+			fmt.Println("this account does not exist")
 		}
 	}
-	defer db.Close()
 	openpage.Execute(w, users)
 }
 
 func Inscription(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
-	// open the first web page openPage.html
+	defer db.Close()
+
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/inscription.html"))
 	var userToAdd user
+
 	if r.Method == "POST" {
 		newEmail := r.FormValue("usermail")
 		newUserName := r.FormValue("username")
 		newPwd := r.FormValue("pwd")
 		newPwd2 := r.FormValue("pwd2")
+
 		booleanEmail, _ := VerifieEmail(newEmail, db)
 		booleanName, _ := VerifieName(newUserName, db)
+
 		if newPwd != newPwd2 {
-			fmt.Println("the password are not equal")
+			fmt.Println("the passwords are not equal")
 		} else if booleanEmail {
-			fmt.Println("this user already exist")
+			fmt.Println("this user already exists")
 		} else if booleanName {
 			fmt.Println("this name is already used")
 		} else {
@@ -176,21 +147,22 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 				cookieName := &http.Cookie{
 					Name:  "Username",
 					Value: userToAdd.username,
+					Path:  "/",
 				}
 				http.SetCookie(w, cookieName)
 				cookiePwd := &http.Cookie{
 					Name:  "Pwd",
-					Value: r.FormValue("pwd"),
+					Value: newPwd,
+					Path:  "/",
 				}
-
 				http.SetCookie(w, cookiePwd)
 				http.Redirect(w, r, "/compte", http.StatusSeeOther)
+				return
 			} else {
 				fmt.Println("error in adduser")
 			}
 		}
 	}
-	defer db.Close()
 	openpage.Execute(w, users)
 }
 
@@ -205,6 +177,7 @@ func VerifieEmail(Email string, db *sql.DB) (bool, error) {
 	}
 	return true, nil
 }
+
 func VerifieName(Name string, db *sql.DB) (bool, error) {
 	var username string
 	err := db.QueryRow("SELECT username FROM user WHERE username=?", Name).Scan(&username)
@@ -216,6 +189,7 @@ func VerifieName(Name string, db *sql.DB) (bool, error) {
 	}
 	return true, nil
 }
+
 func VerifiePwd(Input string, Password string, db *sql.DB) (bool, error) {
 	var hashedPwd string
 	err := db.QueryRow("SELECT pwd FROM user WHERE email=? OR username=?", Input, Input).Scan(&hashedPwd)
@@ -232,6 +206,7 @@ func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
+
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
