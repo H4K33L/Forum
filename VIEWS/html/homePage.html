@@ -4,22 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HANGMAN WEB</title>
-    <!--<link href="/static/form.css" rel="stylesheet" type="text/css" >-->
+    <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
 </head>
 <body>
     <main>
-    <section class="button">
-        <a href="/"><button><span class="text">se déconnecter</span></button></a>
-    </section>
-    <form method="POST">
-        <input type="text"  name="username" autofocus placeholder="enter your username">
-        <input type="text"  name="message" autofocus placeholder="enter your message">
-        <input type="url"  name="image" autofocus placeholder="place here tour url for image">
-        <input type="datetime-local"  name="date">
-        <input type="text"  name="chanel" autofocus placeholder="place here the chanel wher you whant to post">
-        <input type="text"  name="target" autofocus placeholder="specify here any user you want to ping, separate each user whith " \\ ">
-        <input type="submit" value="SEND">
-    </form>
+        <section class="button">
+            <a href="/"><button type="button"><span class="text">se déconnecter</span></button></a>
+        </section>
+        <form method="POST">
+            <input type="text" name="username" required autofocus placeholder="Entrez votre nom d'utilisateur">
+            <input type="text" name="message" required placeholder="Entrez votre message">
+            <input type="url" name="image" required placeholder="Placez ici l'URL de l'image">
+            <input type="datetime-local" name="date">
+            <input type="text" name="chanel" required placeholder="Placez ici le canal où vous voulez poster">
+            <input type="text" name="target" required placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+            <input type="submit" value="Se connecter">
+        </form>
     </main>
 </body>
 </html>
