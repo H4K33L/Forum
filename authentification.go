@@ -37,9 +37,8 @@ func InitDb(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS user (
 				uuid VARCHAR(80) NOT NULL UNIQUE,
 				email VARCHAR(80) NOT NULL UNIQUE,
-				username VARCHAR(80) NOT NULL UNIQUE,
-				pwd VARCHAR(80) NOT NULL,
-				PRIMARY KEY (username, pwd)
+				username VARCHAR(10) NOT NULL UNIQUE,
+				pwd VARCHAR(255) NOT NULL,
 			);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
@@ -56,6 +55,7 @@ func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
 	InitDbpost(db)
 	defer db.Close()
+	createProfile(w, r)
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
 	openpage.Execute(w, users)
 }
@@ -155,7 +155,7 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("this user already exists")
 		} else if booleanName {
 			fmt.Println("this name is already used")
-		} else {
+		} else if newUserName != newPwd && newEmail != newPwd {
 			userToAdd.email = newEmail
 			userToAdd.username = newUserName
 			userToAdd.pwd, err = HashPassword(newPwd)
@@ -176,6 +176,8 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Println("error in adduser")
 			}
+		} else {
+			fmt.Println("you can't take your username as your password")
 		}
 	}
 	openpage.Execute(w, users)

@@ -29,7 +29,7 @@ type post struct {
 func InitDbpost(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS post
 	(
-	id INTEGER NOT NULL UNIQUE,
+	id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
 	uuid VARCHAR(80) NOT NULL UNIQUE,
 	username VARCHAR(80) NOT NULL,
 	message VARCHAR(80),
@@ -40,11 +40,12 @@ func InitDbpost(db *sql.DB) {
 	answers VARCHAR(80),
 	like INTEGER,
 	dislike INTEGER,
-	PRIMARY KEY(id AUTOINCREMENT)
+	UNIQUE( uuid, username),
+	FOREIGN KEY(uuid, username) REFERENCES user(uuid, username)
 	);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
-		log.Fatal(dberr.Error())
+		log.Fatal("InitDbpost :", dberr.Error())
 	}
 }
 

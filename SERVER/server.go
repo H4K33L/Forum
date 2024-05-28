@@ -4,7 +4,6 @@ import (
 	"authentification"
 	"fmt"
 
-	//"html/template"
 	"net/http"
 )
 
@@ -31,9 +30,7 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		/*posts := authentification.GetPost(w,r)
-		var tmpl = template.Must(template.ParseFiles("template/homePage.html"))
-		tmpl.Execute(w, posts)*/
+		fmt.Println(authentification.GetPost(w,r))
 	})
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)

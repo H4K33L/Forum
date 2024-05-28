@@ -39,7 +39,7 @@ func InitDbProfile(db *sql.DB) {
 			);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
-		log.Fatal("InitDbProfile :",(dberr.Error()))
+		log.Fatal("InitDbProfile :", (dberr.Error()))
 	}
 }
 
