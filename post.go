@@ -14,6 +14,7 @@ import (
 )
 
 type post struct {
+	uuid     string
 	username string
 	message  string
 	image    string
@@ -28,7 +29,8 @@ type post struct {
 func InitDbpost(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS post
 	(
-	id INT NOT NULL UNIQUE,
+	id INTEGER NOT NULL UNIQUE,
+	uuid VARCHAR(80) NOT NULL UNIQUE,
 	username VARCHAR(80) NOT NULL,
 	message VARCHAR(80),
 	image VARCHAR(80),
@@ -36,8 +38,8 @@ func InitDbpost(db *sql.DB) {
 	chanel VARCHAR(80),
 	target VARCHAR(80),
 	answers VARCHAR(80),
-	like INT,
-	dislike INT,
+	like INTEGER,
+	dislike INTEGER,
 	PRIMARY KEY(id AUTOINCREMENT)
 	);`
 	_, dberr := db.Exec(table)
@@ -47,18 +49,28 @@ func InitDbpost(db *sql.DB) {
 }
 
 func UserPost(w http.ResponseWriter, r *http.Request) {
+	db := OpenDb("../DATA/User_data.db")
 	var post post
 	if r.Method == "POST" {
-		username, err := r.Cookie("Username")
+		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				// Si le cookie n'existe pas
-				log.Fatal("Cookie username not found")
+				log.Fatal("Cookie uuid not found")
 			}
 			// Autre erreur
-			log.Fatal("Error retrieving cookie:", err)
+			log.Fatal("Error retrieving cookie uuid :", err)
 		}
-		post.username = username.Value
+		var username string
+		err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
+		if err1 != nil {
+			if err1 == sql.ErrNoRows {
+				log.Fatal("sql user post :", err1)
+			}
+			log.Fatal(err1)
+		}
+		post.uuid = uid.Value
+		post.username = username
 		post.message = r.FormValue("message")
 		post.image = r.FormValue("image")
 		then := time.Now()
@@ -70,16 +82,15 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddPost(db *sql.DB, post post) bool {
-	statement, err := db.Prepare("INSERT INTO post(username, message, image, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	statement, err := db.Prepare("INSERT INTO post(uuid, username, message, image, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("sql add post", err)
 		return false
 	}
-	fmt.Println(post.username)
 	chanel := convertToString(post.chanel)
 	target := convertToString(post.target)
 	answers := convertToString(post.answers)
-	statement.Exec(post.username, post.message, post.image, post.date, chanel, target, answers, post.like, post.dislike)
+	statement.Exec(post.uuid, post.username, post.message, post.image, post.date, chanel, target, answers, post.like, post.dislike)
 	defer db.Close()
 	return true
 }
