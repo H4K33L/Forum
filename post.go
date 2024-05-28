@@ -50,7 +50,7 @@ func InitDbpost(db *sql.DB) {
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	var post post
 	if r.Method == "POST" { 
-		username, err := r.Cookie("username")
+		username, err := r.Cookie("Username")
     	if err != nil {
         	if err == http.ErrNoCookie {
             	// Si le cookie n'existe pas
