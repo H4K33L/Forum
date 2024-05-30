@@ -56,8 +56,6 @@ func Compte(w http.ResponseWriter, r *http.Request) {
 	InitDbpost(db)
 	defer db.Close()
 	createProfile(w, r)
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
-	openpage.Execute(w, users)
 }
 
 func Adduser(db *sql.DB, user user) string {

@@ -3,25 +3,27 @@ package authentification
 import (
 	"database/sql"
 	"strings"
-
+	"html/template"
 	"log"
 	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func GetPost(w http.ResponseWriter, r *http.Request) []post {
-	var posts []post
+func GetPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		usename := r.FormValue("username")
 		chanels := r.FormValue("chanels")
-		posts = getPostByBoth(OpenDb("../DATA/User_data.db"), usename, chanels)
+		posts := getPostByBoth(OpenDb("../DATA/User_data.db"), usename, chanels)
+		openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
+    	if err := openpage.Execute(w, posts); err != nil {
+        	log.Fatal("erreur lors de l'envois", err)
+    	}
 	}
-	return posts
 }
 
-func getPostByUser(db *sql.DB, username string) []post {
-	output := []post{}
+func getPostByUser(db *sql.DB, username string) []Post {
+	output := []Post{}
 	UserPost, err := db.Query("SELECT * FROM post WHERE username=?", username)
 	if err != nil {
 		log.Fatal("error in hash")
@@ -30,16 +32,16 @@ func getPostByUser(db *sql.DB, username string) []post {
 	for UserPost.Next() {
 		var ID int
 		var UUID string
-		var post post
+		var post Post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID, &UUID, &post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
+		if err := UserPost.Scan(&ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
 			log.Fatal("error in reading",err)
 		}
-		post.chanel = convertToArray(chanel)
-		post.target = convertToArray(target)
-		post.answers = convertToArray(answers)
+		post.Chanel = convertToArray(chanel)
+		post.Target = convertToArray(target)
+		post.Answers = convertToArray(answers)
 		output = append(output, post)
 	}
 	if err = UserPost.Err(); err != nil {
@@ -52,9 +54,9 @@ func convertToArray(str string) []string {
 	return strings.Split(str, "|\\/|-_-|\\/|+{}")
 }
 
-func getPostByChanel(db *sql.DB, chanel string) []post {
+func getPostByChanel(db *sql.DB, chanel string) []Post {
 	chanel = convertToString(strings.Split(chanel, "R/"))
-	output := []post{}
+	output := []Post{}
 	UserPost, err := db.Query("SELECT * FROM post WHERE chanel=?", chanel)
 	if err != nil {
 		log.Fatal("error in hash")
@@ -63,16 +65,16 @@ func getPostByChanel(db *sql.DB, chanel string) []post {
 	for UserPost.Next() {
 		var ID int
 		var UUID string
-		var post post
+		var post Post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID, &UUID, &post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
+		if err := UserPost.Scan(&ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
 			log.Fatal("error in reading",err)
 		}
-		post.chanel = convertToArray(chanel)
-		post.target = convertToArray(target)
-		post.answers = convertToArray(answers)
+		post.Chanel = convertToArray(chanel)
+		post.Target = convertToArray(target)
+		post.Answers = convertToArray(answers)
 		output = append(output, post)
 	}
 	if err = UserPost.Err(); err != nil {
@@ -81,7 +83,7 @@ func getPostByChanel(db *sql.DB, chanel string) []post {
 	return output
 }
 
-func getPostByBoth(db *sql.DB, username string, chanel string) []post {
+func getPostByBoth(db *sql.DB, username string, chanel string) []Post {
 	postList1 := getPostByUser(db, username)
 	if chanel == "" {
 		return postList1
@@ -90,7 +92,7 @@ func getPostByBoth(db *sql.DB, username string, chanel string) []post {
 	if username == "" {
 		return postList2
 	}
-	output := []post{}
+	output := []Post{}
 	for _, post1 := range postList1 {
 		for _, post2 := range postList2 {
 			if comparePost(post1,post2) {
@@ -101,6 +103,6 @@ func getPostByBoth(db *sql.DB, username string, chanel string) []post {
 	return output
 }
 
-func comparePost(post1 post, post2 post) bool {
-	return post1.username == post2.username && post1.message == post2.message && post1.image == post2.image && post1.date == post2.date && post1.like == post2.like && post1.dislike == post2.dislike &&convertToString(post1.chanel) == convertToString(post2.chanel) && convertToString(post1.target) == convertToString(post2.target) && convertToString(post1.answers) == convertToString(post2.answers)
+func comparePost(post1 Post, post2 Post) bool {
+	return post1.Username == post2.Username && post1.Message == post2.Message && post1.Image == post2.Image && post1.Date == post2.Date && post1.Like == post2.Like && post1.Dislike == post2.Dislike &&convertToString(post1.Chanel) == convertToString(post2.Chanel) && convertToString(post1.Target) == convertToString(post2.Target) && convertToString(post1.Answers) == convertToString(post2.Answers)
 }

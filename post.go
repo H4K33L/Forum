@@ -5,24 +5,23 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	
 	"log"
 	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type post struct {
-	uuid     string
-	username string
-	message  string
-	image    string
-	date     string
-	like     int
-	dislike  int
-	chanel   []string
-	target   []string
-	answers  []string
+type Post struct {
+	Uuid     string
+	Username string
+	Message  string
+	Image    string
+	Date     string
+	Like     int
+	Dislike  int
+	Chanel   []string
+	Target   []string
+	Answers  []string
 }
 
 func InitDbpost(db *sql.DB) {
@@ -50,7 +49,7 @@ func InitDbpost(db *sql.DB) {
 
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
-	var post post
+	var post Post
 	if r.Method == "POST" {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
@@ -69,27 +68,27 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 			}
 			log.Fatal(err1)
 		}
-		post.uuid = uid.Value
-		post.username = username
-		post.message = r.FormValue("message")
-		post.image = r.FormValue("image")
+		post.Uuid = uid.Value
+		post.Username = username
+		post.Message = r.FormValue("message")
+		post.Image = r.FormValue("image")
 		then := time.Now()
-		post.date = strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
-		post.chanel = strings.Split(r.FormValue("chanel"), "R/")
-		post.target = strings.Split(r.FormValue("target"), "\\\\")
+		post.Date = strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
+		post.Chanel = strings.Split(r.FormValue("chanel"), "R/")
+		post.Target = strings.Split(r.FormValue("target"), "\\\\")
 		AddPost(OpenDb("../DATA/User_data.db"), post)
 	}
 }
 
-func AddPost(db *sql.DB, post post) {
+func AddPost(db *sql.DB, post Post) {
 	statement, err := db.Prepare("INSERT INTO post(uuid, username, message, image, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal("sql add post", err)
 	}
-	chanel := convertToString(post.chanel)
-	target := convertToString(post.target)
-	answers := convertToString(post.answers)
-	statement.Exec(post.uuid, post.username, post.message, post.image, post.date, chanel, target, answers, post.like, post.dislike)
+	chanel := convertToString(post.Chanel)
+	target := convertToString(post.Target)
+	answers := convertToString(post.Answers)
+	statement.Exec(post.Uuid, post.Username, post.Message, post.Image, post.Date, chanel, target, answers, post.Like, post.Dislike)
 	defer db.Close()
 }
 
