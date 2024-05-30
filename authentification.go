@@ -87,7 +87,11 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	if uid.Value != "" {
+	iscreate, err := IsUserCreate(uid.Value, db)
+	if err != nil {
+		log.Fatal("error user created but there is a probleme")
+	}
+	if uid.Value != "" && iscreate {
 		http.Redirect(w, r, "/compte", http.StatusSeeOther)
 	} else if r.Method == "POST" {
 		userconnect.email = r.FormValue("usermailconn")
@@ -188,6 +192,18 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 func VerifieNameOrEmail(Input string, db *sql.DB) (bool, error) {
 	var NameOrEmail string
 	err := db.QueryRow("SELECT username FROM user WHERE email=? OR username=?", Input, Input).Scan(&NameOrEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func IsUserCreate(Input string, db *sql.DB) (bool, error) {
+	var uuid string
+	err := db.QueryRow("SELECT username FROM user WHERE uuid=?", Input).Scan(&uuid)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
