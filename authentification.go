@@ -82,13 +82,7 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			cookieUuid := &http.Cookie{
-				Name:    "UUID",
-				Value:   "",
-				Path:    "/",
-				Expires: time.Now().Add(24 * time.Hour),
-			}
-			http.SetCookie(w, cookieUuid)
+
 		} else {
 			// Si une autre erreur s'est produite
 			log.Fatal("Error retrieving cookie 'uuid' :", err)
@@ -98,7 +92,6 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	if uid.Value != "" {
 		http.Redirect(w, r, "/compte", http.StatusSeeOther)
 	} else if r.Method == "POST" {
-
 		userconnect.email = r.FormValue("usermailconn")
 		userconnect.username = r.FormValue("usermailconn")
 		userconnect.pwd = r.FormValue("pwdconn")
