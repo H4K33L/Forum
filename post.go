@@ -5,8 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"fmt"
+	
 	"log"
 	"net/http"
 
@@ -84,18 +83,16 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddPost(db *sql.DB, post post) bool {
+func AddPost(db *sql.DB, post post) {
 	statement, err := db.Prepare("INSERT INTO post(uuid, username, message, image, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println("sql add post", err)
-		return false
+		log.Fatal("sql add post", err)
 	}
 	chanel := convertToString(post.chanel)
 	target := convertToString(post.target)
 	answers := convertToString(post.answers)
 	statement.Exec(post.uuid, post.username, post.message, post.image, post.date, chanel, target, answers, post.like, post.dislike)
 	defer db.Close()
-	return true
 }
 
 func convertToString(array []string) string {
