@@ -29,11 +29,12 @@ func getPostByUser(db *sql.DB, username string) []post {
 	defer UserPost.Close()
 	for UserPost.Next() {
 		var ID int
+		var UUID string
 		var post post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID,&post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
+		if err := UserPost.Scan(&ID, &UUID, &post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
 			log.Fatal("error in reading",err)
 		}
 		post.chanel = convertToArray(chanel)
@@ -61,11 +62,12 @@ func getPostByChanel(db *sql.DB, chanel string) []post {
 	defer UserPost.Close()
 	for UserPost.Next() {
 		var ID int
+		var UUID string
 		var post post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID, &post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
+		if err := UserPost.Scan(&ID, &UUID, &post.username, &post.message, &post.image, &post.date, &chanel, &target, &answers, &post.like, &post.dislike); err != nil {
 			log.Fatal("error in reading",err)
 		}
 		post.chanel = convertToArray(chanel)
