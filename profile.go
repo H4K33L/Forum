@@ -30,12 +30,15 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 func InitDbProfile(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS profile (
 				uuid VARCHAR(80) NOT NULL UNIQUE,
-				username VARCHAR(80) NOT NULL UNIQUE,
+				username VARCHAR(10) NOT NULL UNIQUE,
 				profilepicture VARCHAR(80),
 				follow VARCHAR(80),
 				follower VARCHAR(80),
-				PRIMARY KEY (uuid, username),
-				FOREIGN KEY (uuid, username) REFERENCES user(uuid, username)
+				PRIMARY KEY (uuid),
+				FOREIGN KEY (uuid) 
+					REFERENCES user(uuid) 
+					ON DELETE CASCADE 
+					ON UPDATE CASCADE
 			);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
@@ -48,8 +51,7 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			// Si le cookie n'existe pas
-			log.Fatal("Cookie UUID connexion not found")
+			log.Fatal("cookie not found createProfile")
 		}
 		log.Fatal("Error retrieving cookie UUID:", err)
 	}

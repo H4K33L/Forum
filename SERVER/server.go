@@ -11,7 +11,6 @@ import (
 func main() {
 	db := authentification.OpenDb("../DATA/User_data.db")
 	authentification.InitDb(db)
-	authentification.InitDbProfile(db)
 	defer db.Close()
 	fmt.Println("server successfully up, go to http://localhost:8080")
 
@@ -21,6 +20,7 @@ func main() {
 
 	// Set URL handlers for different routes.
 	http.HandleFunc("/", authentification.Accueil)
+	http.HandleFunc("/deconnexion", authentification.Deconnexion)
 	http.HandleFunc("/inscription", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Inscription(w, r)
 	})
@@ -30,7 +30,7 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		fmt.Println(authentification.GetPost(w,r))
+		fmt.Println(authentification.GetPost(w, r))
 	})
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)

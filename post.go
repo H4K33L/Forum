@@ -30,18 +30,20 @@ func InitDbpost(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS post
 	(
 	id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
-	uuid VARCHAR(80) NOT NULL UNIQUE,
+	uuid VARCHAR(80) NOT NULL,
 	username VARCHAR(80) NOT NULL,
-	message VARCHAR(80),
+	message LONG VARCHAR,
 	image VARCHAR(80),
 	date VARCHAR(80),
 	chanel VARCHAR(80),
 	target VARCHAR(80),
-	answers VARCHAR(80),
+	answers LONG VARCHAR,
 	like INTEGER,
 	dislike INTEGER,
-	UNIQUE( uuid, username),
-	FOREIGN KEY(uuid, username) REFERENCES user(uuid, username)
+	FOREIGN KEY(uuid) 
+		REFERENCES user(uuid)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
 	);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
@@ -56,11 +58,11 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				// Si le cookie n'existe pas
-				log.Fatal("Cookie uuid not found")
+				log.Fatal("cookie not found userpost")
 			}
 			// Autre erreur
 			log.Fatal("Error retrieving cookie uuid :", err)
+
 		}
 		var username string
 		err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)

@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 
+	"time"
+
 	"github.com/gofrs/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -53,6 +55,7 @@ func Accueil(w http.ResponseWriter, r *http.Request) {
 
 func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("../DATA/User_data.db")
+	InitDbProfile(db)
 	InitDbpost(db)
 	defer db.Close()
 	createProfile(w, r)
@@ -76,54 +79,61 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 
 	openpage := template.Must(template.ParseFiles("../VIEWS/html/connexion.html"))
 	var userconnect user
-
-	if r.Method == "POST" {
-		uid, err := r.Cookie("UUID")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				// Si le cookie n'existe pas
-				log.Fatal("Cookie username not found")
-				// Vous pouvez gérer ce cas en définissant une valeur par défaut, en renvoyant une erreur HTTP, etc.
-				log.Fatal("Cookie 'uuid' not found", http.StatusUnauthorized)
-				return
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			cookieUuid := &http.Cookie{
+				Name:    "UUID",
+				Value:   "",
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
 			}
+			http.SetCookie(w, cookieUuid)
+		} else {
 			// Si une autre erreur s'est produite
 			log.Fatal("Error retrieving cookie 'uuid' :", err)
 		}
-		userconnect.uid = uid.Value
+
+	}
+	if uid.Value != "" {
+		http.Redirect(w, r, "/compte", http.StatusSeeOther)
+	} else if r.Method == "POST" {
+
 		userconnect.email = r.FormValue("usermailconn")
 		userconnect.username = r.FormValue("usermailconn")
 		userconnect.pwd = r.FormValue("pwdconn")
-		if userconnect.uid != "" {
+		err1 := db.QueryRow("SELECT uuid FROM user WHERE username=? OR email=?", userconnect.username, userconnect.email).Scan(&userconnect.uid)
+		if err1 != nil {
+			if err1 == sql.ErrNoRows {
+				log.Fatal("sql connexion :", err1)
+			}
+			log.Fatal(err1)
+		}
+		booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
+		if err != nil {
+			log.Fatal("conn email ", err)
+		}
+		booleanName, err2 := VerifieNameOrEmail(userconnect.username, db)
+		if err2 != nil {
+			log.Fatal("conn name ", err2)
+		}
+		booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
+		if err1 != nil {
+			log.Fatal("conn pwd ", err1)
+		}
+		if !booleanPwd {
+			fmt.Println("this password is wrong:", userconnect.pwd)
+		} else if booleanUser || booleanName {
+			cookieUuid := &http.Cookie{
+				Name:    "UUID",
+				Value:   userconnect.uid,
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, cookieUuid)
 			http.Redirect(w, r, "/compte", http.StatusSeeOther)
 		} else {
-			booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
-			if err != nil {
-				log.Fatal("conn email ", err)
-			}
-			booleanName, err2 := VerifieNameOrEmail(userconnect.username, db)
-			if err2 != nil {
-				log.Fatal("conn name ", err2)
-			}
-			booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
-			if err1 != nil {
-				log.Fatal("conn pwd ", err1)
-			}
-
-			if !booleanPwd {
-				fmt.Println("this password is wrong:", userconnect.pwd)
-			} else if booleanUser || booleanName {
-				cookieUuid := &http.Cookie{
-					Name:  "UUID",
-					Value: userconnect.uid,
-					Path:  "/",
-				}
-				http.SetCookie(w, cookieUuid)
-				http.Redirect(w, r, "/compte", http.StatusSeeOther)
-				return
-			} else {
-				fmt.Println("this account does not exist")
-			}
+			fmt.Println("this account does not exist")
 		}
 	}
 	openpage.Execute(w, users)
@@ -166,9 +176,10 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			errors := Adduser(db, userToAdd)
 			if errors == "" {
 				cookieUuid := &http.Cookie{
-					Name:  "UUID",
-					Value: userToAdd.uid,
-					Path:  "/",
+					Name:    "UUID",
+					Value:   userToAdd.uid,
+					Path:    "/",
+					Expires: time.Now().Add(24 * time.Hour),
 				}
 				http.SetCookie(w, cookieUuid)
 				http.Redirect(w, r, "/compte", http.StatusSeeOther)
@@ -215,4 +226,15 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func Deconnexion(w http.ResponseWriter, r *http.Request) {
+	cookieUuid := &http.Cookie{
+		Name:    "UUID",
+		Value:   "",
+		Path:    "/",
+		Expires: time.Now().Add(24 * time.Hour),
+	}
+	http.SetCookie(w, cookieUuid)
+	http.Redirect(w, r, "/accueil", http.StatusSeeOther)
 }
