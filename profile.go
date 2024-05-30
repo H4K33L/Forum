@@ -61,8 +61,8 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Fatal(err1)
 	}
-	booleanEmail, _ := VerifieEmail(username, db)
-	booleanName, _ := VerifieName(username, db)
+	booleanEmail, _ := VerifieNameOrEmail(username, db)
+	booleanName, _ := VerifieNameOrEmail(username, db)
 	if booleanEmail || booleanName {
 		var userProfile profile
 		userProfile.username = username

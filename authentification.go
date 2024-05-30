@@ -38,7 +38,7 @@ func InitDb(db *sql.DB) {
 				uuid VARCHAR(80) NOT NULL UNIQUE,
 				email VARCHAR(80) NOT NULL UNIQUE,
 				username VARCHAR(10) NOT NULL UNIQUE,
-				pwd VARCHAR(255) NOT NULL,
+				pwd VARCHAR(255) NOT NULL
 			);`
 	_, dberr := db.Exec(table)
 	if dberr != nil {
@@ -97,11 +97,11 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 		if userconnect.uid != "" {
 			http.Redirect(w, r, "/compte", http.StatusSeeOther)
 		} else {
-			booleanUser, err := VerifieEmail(userconnect.email, db)
+			booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
 			if err != nil {
 				log.Fatal("conn email ", err)
 			}
-			booleanName, err2 := VerifieName(userconnect.username, db)
+			booleanName, err2 := VerifieNameOrEmail(userconnect.username, db)
 			if err2 != nil {
 				log.Fatal("conn name ", err2)
 			}
@@ -146,8 +146,8 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			log.Fatalf("failed to generate UUID: %v", err)
 		}
 		//log.Printf("generated Version 4 UUID %v", u)
-		booleanEmail, _ := VerifieEmail(newEmail, db)
-		booleanName, _ := VerifieName(newUserName, db)
+		booleanEmail, _ := VerifieNameOrEmail(newEmail, db)
+		booleanName, _ := VerifieNameOrEmail(newUserName, db)
 
 		if newPwd != newPwd2 {
 			fmt.Println("the passwords are not equal")
@@ -183,21 +183,9 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, users)
 }
 
-func VerifieEmail(Email string, db *sql.DB) (bool, error) {
-	var email string
-	err := db.QueryRow("SELECT email FROM user WHERE email=?", Email).Scan(&email)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
-}
-
-func VerifieName(Name string, db *sql.DB) (bool, error) {
-	var username string
-	err := db.QueryRow("SELECT username FROM user WHERE username=?", Name).Scan(&username)
+func VerifieNameOrEmail(Input string, db *sql.DB) (bool, error) {
+	var NameOrEmail string
+	err := db.QueryRow("SELECT username FROM user WHERE email=? OR username=?", Input, Input).Scan(&NameOrEmail)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
