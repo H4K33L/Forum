@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HANGMAN WEB</title>
+    <title>Kitsune</title>
     <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
 </head>
 <body>
@@ -26,11 +26,11 @@
     </main>
     <content>
         {{range .}}
-        <p>{{ .date }}</p>
-            <img src="{{ .image }}" >
-            <h3>{{ .message }}</h3>
-            <p>like : {{.like}}</p>
-            <p>dislike : {{.dislike}}</p>
+        <p>{{ .Date }}</p>
+            <img src="{{ .Image }}" >
+            <h3>{{ .Message }}</h3>
+            <p>like : {{.Like}}</p>
+            <p>dislike : {{.Dislike}}</p>
         {{ end }}
     </content>
 </body>

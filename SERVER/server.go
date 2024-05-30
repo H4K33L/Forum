@@ -3,7 +3,6 @@ package main
 import (
 	"authentification"
 	"fmt"
-
 	"net/http"
 )
 
@@ -30,7 +29,7 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		fmt.Println(authentification.GetPost(w, r))
+		authentification.GetPost(w, r)
 	})
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)
