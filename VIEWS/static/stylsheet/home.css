@@ -1,5 +1,7 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0%;
+    padding: 0%;
 }
 
 header {
@@ -107,6 +109,7 @@ header {
     overflow: hidden;
     text-overflow: ellipsis;
     transition: background-color .3s;
+    margin-left: 850px;
   }
   
   .button__icon-wrapper {
@@ -144,3 +147,42 @@ header {
     transition: transform .3s ease-in-out .1s;
     transform: translate(0);
   } 
+
+  .content{
+    display: flex;
+  }
+aside {
+    background-color:darkgray;
+    padding: 20px;
+    width: 250px;
+    height: 600px;
+    align-items: center;
+    justify-content: space-between;
+}
+.marge-elements {
+    background-color: darkgray;
+    padding: 20px;
+    width: 250px;
+    height: 600px;
+    align-items: center;
+    justify-content: space-between;
+}
+.bloc-element {
+    background-color: white;
+    padding: 15px;
+    width: 200px;
+    height: 250px;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 15px;
+    margin: 10px;
+}
+.posts-elements {
+    background-color: white;
+    padding: 15px;
+    width: 1500px;
+    height: 600px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px;
+}
