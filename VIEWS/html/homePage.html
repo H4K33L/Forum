@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitsune</title>
+    <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
+</head>
+<body>
+    <main>
+        <section class="button">
+            <a href="/profile"><button type="button"><span class="text">profile page</span></button></a>
+        </section>
+        <form method="POST">
+            <input type="text" name="message" required autofocus placeholder="Entrez votre message">
+            <input type="url" name="image" autofocus placeholder="Placez ici l'URL de l'image">
+            <input type="text" name="chanel" required autofocus placeholder="Placez ici le canal où vous voulez poster">
+            <input type="text" name="target" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+            <input type="submit" value="Post le Post">
+        </form>
+        <form method="GET">
+            <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur">
+            <input type="text" name="chanels"autofocus  placeholder="Entrer un chanel">
+            <input type="submit" value="Find Post">
+        </form>
+    </main>
+    <content>
+        {{range .}}
+        <p>{{ .Date }}</p>
+            <img src="{{ .Image }}" >
+            <h3>{{ .Message }}</h3>
+            <p>like : {{.Like}}</p>
+            <p>dislike : {{.Dislike}}</p>
+        {{ end }}
+    </content>
+</body>
+</html>
