@@ -26,11 +26,23 @@
     </main>
     <content>
         {{range .}}
-        <p>{{ .Date }}</p>
-            <img src="{{ .Image }}" >
-            <h3>{{ .Message }}</h3>
-            <p>like : {{.Like}}</p>
-            <p>dislike : {{.Dislike}}</p>
+            <p>{{ .Date }}</p>
+                <img src="{{ .Image }}" >
+                <h3>{{ .Message }}</h3>
+                <p>like : {{.Like}}</p>
+                <form action="/like" method="Post">
+                    <select name="like">
+                        <option value="{{.ID}}"></option>
+                    </select>
+                    <button><img src="" alt=""></button>
+                </form>
+                <p>dislike : {{.Dislike}}</p>
+                <form action="/dislike" method="post">
+                    <select name="dislike">
+                        <option value="{{.ID}}"></option>
+                    </select>
+                    <button><img src="" alt=""></button>
+                </form>
         {{ end }}
     </content>
 </body>
