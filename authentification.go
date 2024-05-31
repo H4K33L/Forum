@@ -3,6 +3,7 @@ package authentification
 import (
 	"database/sql"
 	"fmt"
+	"unicode"
 
 	"html/template"
 	"log"
@@ -153,9 +154,12 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 		//log.Printf("generated Version 4 UUID %v", u)
 		booleanEmail, _ := VerifieNameOrEmail(newEmail, db)
 		booleanName, _ := VerifieNameOrEmail(newUserName, db)
-
 		if newPwd != newPwd2 {
 			fmt.Println("the passwords are not equal")
+		} else if len(newPwd) < 8 {
+			fmt.Println("this password is not long enough")
+		} else if !isCorrectPassword(newPwd) {
+			fmt.Println("this password is not secure enough")
 		} else if booleanEmail {
 			fmt.Println("this user already exists")
 		} else if booleanName {
@@ -244,4 +248,21 @@ func Deconnexion(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookieUuid)
 	http.Redirect(w, r, "/accueil", http.StatusSeeOther)
+}
+
+func isCorrectPassword(password string) bool {
+	var hasUpper, hasLower, hasDigit, hasSpecial bool
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsDigit(char):
+			hasDigit = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+	return hasUpper && hasLower && hasDigit && hasSpecial
 }

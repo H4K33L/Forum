@@ -10,8 +10,8 @@
     <form method="POST">
         <input type="email" name="usermail" required autofocus placeholder="entrer votre email">
         <input type="text" name="username" required autofocus placeholder="entrer votre pseudo" maxlength="10">
-        <input type="password" name="pwd" required autofocus placeholder="entrer un mot de passe">
-        <input type="password" name="pwd2" required autofocus placeholder="réecriver le mot de passe">
+        <input type="password" minlength="8" name="pwd" required autofocus placeholder="entrer un mot de passe">
+        <input type="password" minlength="8" name="pwd2" required autofocus placeholder="réecriver le mot de passe">
         <input type="submit" value="s'inscrire">
     </form>
 </body>
