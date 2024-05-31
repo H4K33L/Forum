@@ -4,6 +4,8 @@ import (
 	"authentification"
 	"fmt"
 	"net/http"
+	"html/template"
+	"log"
 )
 
 // main is the main function of the program.
@@ -29,7 +31,11 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		authentification.GetPost(w, r)
+		posts := authentification.GetPost(w, r)
+		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
+    	if err := openpage.Execute(w, posts); err != nil {
+        	log.Fatal("erreur lors de l'envois", err)
+    	}
 	})
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)

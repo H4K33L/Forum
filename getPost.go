@@ -3,23 +3,19 @@ package authentification
 import (
 	"database/sql"
 	"strings"
-	"html/template"
 	"log"
 	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func GetPost(w http.ResponseWriter, r *http.Request) {
+func GetPost(w http.ResponseWriter, r *http.Request) []Post {
 	if r.Method == "GET" {
 		usename := r.FormValue("username")
 		chanels := r.FormValue("chanels")
-		posts := getPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels)
-		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
-    	if err := openpage.Execute(w, posts); err != nil {
-        	log.Fatal("erreur lors de l'envois", err)
-    	}
+		return getPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels)
 	}
+	return []Post{}
 }
 
 func getPostByUser(db *sql.DB, username string) []Post {
