@@ -14,8 +14,8 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		usename := r.FormValue("username")
 		chanels := r.FormValue("chanels")
-		posts := getPostByBoth(OpenDb("../DATA/User_data.db"), usename, chanels)
-		openpage := template.Must(template.ParseFiles("../VIEWS/html/homePage.html"))
+		posts := getPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels)
+		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
     	if err := openpage.Execute(w, posts); err != nil {
         	log.Fatal("erreur lors de l'envois", err)
     	}

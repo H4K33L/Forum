@@ -8,7 +8,7 @@ import (
 
 // main is the main function of the program.
 func main() {
-	db := authentification.OpenDb("../DATA/User_data.db")
+	db := authentification.OpenDb("./DATA/User_data.db")
 	authentification.InitDb(db)
 	defer db.Close()
 	fmt.Println("server successfully up, go to http://localhost:8080")

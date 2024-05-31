@@ -50,12 +50,12 @@ func InitDb(db *sql.DB) {
 }
 
 func Accueil(w http.ResponseWriter, r *http.Request) {
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/accueil.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
 	openpage.Execute(w, users)
 }
 
 func Compte(w http.ResponseWriter, r *http.Request) {
-	db := OpenDb("../DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db")
 	InitDbProfile(db)
 	InitDbpost(db)
 	defer db.Close()
@@ -73,10 +73,10 @@ func Adduser(db *sql.DB, user user) string {
 }
 
 func Connexion(w http.ResponseWriter, r *http.Request) {
-	db := OpenDb("../DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
 
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/connexion.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/connexion.html"))
 	var userconnect user
 	uid, err := r.Cookie("UUID")
 	if err != nil {
@@ -136,10 +136,10 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 }
 
 func Inscription(w http.ResponseWriter, r *http.Request) {
-	db := OpenDb("../DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
 
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/inscription.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/inscription.html"))
 	var userToAdd user
 
 	if r.Method == "POST" {

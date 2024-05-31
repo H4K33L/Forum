@@ -22,7 +22,7 @@ var profiles profile
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	// open the first web page openPage.html
-	openpage := template.Must(template.ParseFiles("../VIEWS/html/profilePage.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/profilePage.html"))
 	// execute the modification of the page
 	openpage.Execute(w, profiles)
 }
@@ -47,7 +47,7 @@ func InitDbProfile(db *sql.DB) {
 }
 
 func createProfile(w http.ResponseWriter, r *http.Request) {
-	db := OpenDb("../DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db")
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
