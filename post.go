@@ -2,11 +2,11 @@ package authentification
 
 import (
 	"database/sql"
+	"log"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
-	"log"
-	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
