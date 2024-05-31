@@ -81,12 +81,18 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-
+			cookieUuid := &http.Cookie{
+				Name:    "UUID",
+				Value:   "",
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, cookieUuid)
+			uid = cookieUuid
 		} else {
 			// Si une autre erreur s'est produite
 			log.Fatal("Error retrieving cookie 'uuid' :", err)
 		}
-
 	}
 	iscreate, err := IsUserCreate(uid.Value, db)
 	if err != nil {
@@ -169,7 +175,7 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 			userToAdd.username = newUserName
 			userToAdd.pwd, err = HashPassword(newPwd)
 			if err != nil {
-				log.Fatal("erreur hash password inscription :", err)
+				log.Fatal("erreur hash password inscription ")
 			}
 			userToAdd.uid = u.String()
 			errors := Adduser(db, userToAdd)

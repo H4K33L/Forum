@@ -2,11 +2,11 @@ package authentification
 
 import (
 	"database/sql"
+	"log"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
-	"log"
-	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -78,7 +78,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Date = strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
 		post.Chanel = strings.Split(r.FormValue("chanel"), "R/")
 		post.Target = strings.Split(r.FormValue("target"), "\\\\")
-		AddPost(OpenDb("/DATA/User_data.db"), post)
+		AddPost(OpenDb("./DATA/User_data.db"), post)
 	}
 }
 
