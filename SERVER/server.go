@@ -3,6 +3,7 @@ package main
 import (
 	"authentification"
 	"fmt"
+	"time"
 	"html/template"
 	"log"
 	"net/http"
@@ -31,9 +32,50 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		posts := authentification.GetPost(w, r)
 		authentification.Like(w, r)
 		authentification.Dislike(w, r)
+
+		var posts []authentification.Post
+		if authentification.GetPost(w, r) != nil {
+			requestPostName := &http.Cookie{
+				Name:    "LastUsername",
+				Value:   r.FormValue("username"),
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, requestPostName)
+			
+			requestPostChanel := &http.Cookie{
+				Name:    "LastChanel",
+				Value:   r.FormValue("chanels"),
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, requestPostChanel)
+
+			posts = authentification.GetPost(w, r)
+		} else {
+			lastUsername, err := r.Cookie("LastUsername")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found LastUsername")
+				}
+				// Autre erreur
+				log.Fatal("Error retrieving cookie LastUsername :", err)
+			}
+
+			lastChanel, err := r.Cookie("LastChanel")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found LastChanel")
+				}
+				// Autre erreur
+				log.Fatal("Error retrieving cookie LastChanel :", err)
+			}
+
+			posts = authentification.GetPostByBoth(db,lastUsername.Value,lastChanel.Value)
+		}
+
 		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
 		if err := openpage.Execute(w, posts); err != nil {
 			log.Fatal("erreur lors de l'envois ", err)

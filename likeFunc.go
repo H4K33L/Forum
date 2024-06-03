@@ -4,34 +4,47 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func Like(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		db := OpenDb("./DATA/User_data.db")
-		defer db.Close()
 		ID := r.FormValue("like")
-		likes := getPostByID(db, ID)
-		nbLikes := likes.Like + 1
-		_, err := db.Query("UPDATE post SET like =? WHERE ID =? ", nbLikes, ID)
-		if err != nil {
-			log.Fatal("err rows like :", err)
+		if ID != "" {
+			db := OpenDb("./DATA/User_data.db")
+			defer db.Close()
+			likes := getPostByID(db, ID)
+			nbLikes := likes.Like + 1
+			i, err := strconv.Atoi(ID)
+    		if err != nil {
+        		log.Fatal(err)
+    		}
+			_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
+			if err != nil {
+				log.Fatal("err rows like :", err)
+			}
 		}
 	}
 }
 
 func Dislike(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		db := OpenDb("./DATA/User_data.db")
-		defer db.Close()
 		ID := r.FormValue("dislike")
-		dislikes := getPostByID(db, ID)
-		nbDislikes := dislikes.Dislike + 1
-		_, err := db.Query("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, ID)
-		if err != nil {
-			log.Fatal("err rows dislike :", err)
+		if ID != "" {
+			db := OpenDb("./DATA/User_data.db")
+			defer db.Close()
+			dislikes := getPostByID(db, ID)
+			nbDislikes := dislikes.Dislike + 1
+			i, err := strconv.Atoi(ID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
+			if err != nil {
+				log.Fatal("err rows dislike :", err)
+			}
 		}
 	}
 }
