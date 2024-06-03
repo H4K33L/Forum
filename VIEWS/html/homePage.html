@@ -30,18 +30,18 @@
                 <img src="{{ .Image }}" >
                 <h3>{{ .Message }}</h3>
                 <p>like : {{.Like}}</p>
-                <form action="/like" method="Post">
+                <form method="POST">
                     <select name="like">
                         <option value="{{.ID}}"></option>
                     </select>
-                    <button><img src="" alt=""></button>
+                    <input type="submit" ><img src="" alt=""></input>
                 </form>
                 <p>dislike : {{.Dislike}}</p>
-                <form action="/dislike" method="post">
+                <form method="POST">
                     <select name="dislike">
                         <option value="{{.ID}}"></option>
                     </select>
-                    <button><img src="" alt=""></button>
+                    <input type="submit" ><img src="" alt=""></input>
                 </form>
         {{ end }}
     </content>

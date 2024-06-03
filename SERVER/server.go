@@ -32,17 +32,12 @@ func main() {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
 		posts := authentification.GetPost(w, r)
+		authentification.Like(w, r)
+		authentification.Dislike(w, r)
 		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
 		if err := openpage.Execute(w, posts); err != nil {
-			log.Fatal("erreur lors de l'envois", err)
+			log.Fatal("erreur lors de l'envois ", err)
 		}
-	})
-	http.HandleFunc("/like", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Like(w, r)
-	})
-
-	http.HandleFunc("/dislike", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Dislike(w, r)
 	})
 
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {

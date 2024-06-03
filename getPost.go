@@ -2,9 +2,9 @@ package authentification
 
 import (
 	"database/sql"
-	"strings"
 	"log"
 	"net/http"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -26,14 +26,13 @@ func getPostByUser(db *sql.DB, username string) []Post {
 	}
 	defer UserPost.Close()
 	for UserPost.Next() {
-		var ID int
 		var UUID string
 		var post Post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
-			log.Fatal("error in reading",err)
+		if err := UserPost.Scan(&post.ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
+			log.Fatal("error in reading", err)
 		}
 		post.Chanel = convertToArray(chanel)
 		post.Target = convertToArray(target)
@@ -59,14 +58,13 @@ func getPostByChanel(db *sql.DB, chanel string) []Post {
 	}
 	defer UserPost.Close()
 	for UserPost.Next() {
-		var ID int
 		var UUID string
 		var post Post
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
-			log.Fatal("error in reading",err)
+		if err := UserPost.Scan(&post.ID, &UUID, &post.Username, &post.Message, &post.Image, &post.Date, &chanel, &target, &answers, &post.Like, &post.Dislike); err != nil {
+			log.Fatal("error in reading", err)
 		}
 		post.Chanel = convertToArray(chanel)
 		post.Target = convertToArray(target)
@@ -91,7 +89,7 @@ func getPostByBoth(db *sql.DB, username string, chanel string) []Post {
 	output := []Post{}
 	for _, post1 := range postList1 {
 		for _, post2 := range postList2 {
-			if comparePost(post1,post2) {
+			if comparePost(post1, post2) {
 				output = append(output, post1)
 			}
 		}
@@ -100,5 +98,5 @@ func getPostByBoth(db *sql.DB, username string, chanel string) []Post {
 }
 
 func comparePost(post1 Post, post2 Post) bool {
-	return post1.Username == post2.Username && post1.Message == post2.Message && post1.Image == post2.Image && post1.Date == post2.Date && post1.Like == post2.Like && post1.Dislike == post2.Dislike &&convertToString(post1.Chanel) == convertToString(post2.Chanel) && convertToString(post1.Target) == convertToString(post2.Target) && convertToString(post1.Answers) == convertToString(post2.Answers)
+	return post1.ID == post2.ID
 }

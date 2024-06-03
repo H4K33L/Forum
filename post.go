@@ -12,6 +12,7 @@ import (
 )
 
 type Post struct {
+	ID       int
 	Uuid     string
 	Username string
 	Message  string
@@ -51,6 +52,7 @@ func InitDbpost(db *sql.DB) {
 
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
+	defer db.Close()
 	var post Post
 	if r.Method == "POST" {
 		uid, err := r.Cookie("UUID")
@@ -78,7 +80,9 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Date = strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
 		post.Chanel = strings.Split(r.FormValue("chanel"), "R/")
 		post.Target = strings.Split(r.FormValue("target"), "\\\\")
-		AddPost(OpenDb("./DATA/User_data.db"), post)
+		if r.FormValue("chanel") != "" {
+			AddPost(OpenDb("./DATA/User_data.db"), post)
+		}
 	}
 }
 
