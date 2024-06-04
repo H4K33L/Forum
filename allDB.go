@@ -1,5 +1,5 @@
 package authentification
-
+/*
 import (
 	"database/sql"
 	"log"
@@ -72,3 +72,4 @@ func InitDbProfile(db *sql.DB) {
 		log.Fatal("InitDbProfile :", (dberr.Error()))
 	}
 }
+*/

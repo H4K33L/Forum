@@ -27,6 +27,25 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, profiles)
 }
 
+func InitDbProfile(db *sql.DB) {
+	table := `CREATE TABLE IF NOT EXISTS profile (
+				uuid VARCHAR(80) NOT NULL UNIQUE,
+				username VARCHAR(10) NOT NULL UNIQUE,
+				profilepicture VARCHAR(80),
+				follow VARCHAR(80),
+				follower VARCHAR(80),
+				PRIMARY KEY (uuid),
+				FOREIGN KEY (uuid) 
+					REFERENCES user(uuid) 
+					ON DELETE CASCADE 
+					ON UPDATE CASCADE
+			);`
+	_, dberr := db.Exec(table)
+	if dberr != nil {
+		log.Fatal("InitDbProfile :", (dberr.Error()))
+	}
+}
+
 func createProfile(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	uid, err := r.Cookie("UUID")
