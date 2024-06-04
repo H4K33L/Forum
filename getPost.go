@@ -13,9 +13,9 @@ func GetPost(w http.ResponseWriter, r *http.Request) []Post {
 	if r.Method == "GET" {
 		usename := r.FormValue("username")
 		chanels := r.FormValue("chanels")
-		return getPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels)
+		return GetPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels)
 	}
-	return []Post{}
+	return nil
 }
 
 func getPostByUser(db *sql.DB, username string) []Post {
@@ -77,7 +77,7 @@ func getPostByChanel(db *sql.DB, chanel string) []Post {
 	return output
 }
 
-func getPostByBoth(db *sql.DB, username string, chanel string) []Post {
+func GetPostByBoth(db *sql.DB, username string, chanel string) []Post {
 	postList1 := getPostByUser(db, username)
 	if chanel == "" {
 		return postList1
