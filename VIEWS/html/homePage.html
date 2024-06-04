@@ -43,6 +43,12 @@
                     </select>
                     <input type="submit" ><img src="" alt=""></input>
                 </form>
+                <form method="POST">
+                    <select name="ToDelID">
+                        <option value="{{.ID}}"></option>
+                    </select>
+                    <input type="submit"value="DELETE">
+                </form>
         {{ end }}
     </content>
 </body>

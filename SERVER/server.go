@@ -34,6 +34,7 @@ func main() {
 		authentification.UserPost(w, r)
 		authentification.Like(w, r)
 		authentification.Dislike(w, r)
+		authentification.PostSupr(w, r)
 
 		var posts []authentification.Post
 		if authentification.GetPost(w, r) != nil {
