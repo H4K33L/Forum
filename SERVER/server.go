@@ -35,6 +35,7 @@ func main() {
 		authentification.Like(w, r)
 		authentification.Dislike(w, r)
 		authentification.PostSupr(w, r)
+		authentification.PostEdit(w, r)
 
 		var posts []authentification.Post
 		if authentification.GetPost(w, r) != nil {
@@ -61,7 +62,6 @@ func main() {
 				if err == http.ErrNoCookie {
 					log.Fatal("cookie not found LastUsername")
 				}
-				// Autre erreur
 				log.Fatal("Error retrieving cookie LastUsername :", err)
 			}
 
@@ -70,11 +70,17 @@ func main() {
 				if err == http.ErrNoCookie {
 					log.Fatal("cookie not found LastChanel")
 				}
-				// Autre erreur
 				log.Fatal("Error retrieving cookie LastChanel :", err)
 			}
 
-			posts = authentification.GetPostByBoth(db,lastUsername.Value,lastChanel.Value)
+			uid, err := r.Cookie("UUID")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found userpost")
+				}
+				log.Fatal("Error retrieving cookie uuid :", err)
+			}
+			posts = authentification.GetPostByBoth(db,lastUsername.Value,lastChanel.Value, uid)
 		}
 
 		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))

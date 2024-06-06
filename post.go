@@ -14,6 +14,7 @@ import (
 type Post struct {
 	ID       int
 	Uuid     string
+	UuidCookie     bool
 	Username string
 	Message  string
 	Image    string
@@ -60,9 +61,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 			if err == http.ErrNoCookie {
 				log.Fatal("cookie not found userpost")
 			}
-			// Autre erreur
 			log.Fatal("Error retrieving cookie uuid :", err)
-
 		}
 		var username string
 		err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
