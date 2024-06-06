@@ -91,6 +91,9 @@ func main() {
 	http.HandleFunc("/username", func(w http.ResponseWriter, r *http.Request) {
 		authentification.ChangeUsername(w, r)
 	})
+	http.HandleFunc("/suppression", func(w http.ResponseWriter, r *http.Request) {
+		authentification.Delete(w, r)
+	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }

@@ -248,3 +248,29 @@ func isCorrectPassword(password string) bool {
 	}
 	return hasUpper && hasLower && hasDigit && hasSpecial
 }
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	db := OpenDb("./DATA/User_data.db")
+	defer db.Close()
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			cookieUuid := &http.Cookie{
+				Name:    "UUID",
+				Value:   "",
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, cookieUuid)
+			uid = cookieUuid
+		} else {
+			// Si une autre erreur s'est produite
+			log.Fatal("Error retrieving cookie 'uuid' :", err)
+		}
+	}
+	_, err = db.Exec("DELETE FROM user WHERE uuid=?", uid.Value)
+	if err != nil {
+		fmt.Println("err delete :", err)
+	}
+	Deconnexion(w, r)
+}
