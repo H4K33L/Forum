@@ -72,8 +72,6 @@ func main() {
 				}
 				log.Fatal("Error retrieving cookie LastChanel :", err)
 			}
-
-			posts = authentification.GetPostByBoth(db, lastUsername.Value, lastChanel.Value)
 			uid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {
@@ -81,7 +79,7 @@ func main() {
 				}
 				log.Fatal("Error retrieving cookie uuid :", err)
 			}
-			posts = authentification.GetPostByBoth(db,lastUsername.Value,lastChanel.Value, uid)
+			posts = authentification.GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid)
 		}
 
 		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
