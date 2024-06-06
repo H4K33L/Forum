@@ -26,6 +26,7 @@
     </main>
     <content>
         {{range .}}
+            <h1>{{ .Username }}</h1>
             <p>{{ .Date }}</p>
                 <img src="{{ .Image }}" >
                 <h3>{{ .Message }}</h3>
@@ -43,6 +44,26 @@
                     </select>
                     <input type="submit" ><img src="" alt=""></input>
                 </form>
+                <!-- a aficher sur bouton déroulant et si l'utilisateur est l'auteur des posts -->
+                {{if .UuidCookie}}
+                    <form method="POST">
+                        <select name="ToDelID">
+                            <option value="{{.ID}}"></option>
+                        </select>
+                        <input type="submit"value="DELETE">
+                    </form>
+                    <form method="POST">
+                        <select name="ToEditID">
+                            <option value="{{.ID}}"></option>
+                        </select>
+                        <input type="text" name="messageEdit" autofocus placeholder="Entrez votre message">
+                        <input type="url" name="imageEdit" autofocus placeholder="Placez ici l'URL de l'image">
+                        <input type="text" name="chanelEdit" autofocus placeholder="Placez ici le canal où vous voulez poster">
+                        <input type="text" name="targetEdit" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+                        <input type="submit"value="EDIT">
+                    </form>
+                {{ end }}
+                <!--                                                                            -->
         {{ end }}
     </content>
 </body>
