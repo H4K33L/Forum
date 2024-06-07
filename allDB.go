@@ -35,9 +35,11 @@ func InitDbpost(db *sql.DB) {
 	(
 	id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
 	uuid VARCHAR(80) NOT NULL,
+	postuuid VARCHAR(80) NOT NULL UNIQUE,
 	username VARCHAR(80) NOT NULL,
 	message LONG VARCHAR,
-	image VARCHAR(80),
+	document VARCHAR(80),
+	typedoc VARCHAR(80),
 	date VARCHAR(80),
 	chanel VARCHAR(80),
 	target VARCHAR(80),

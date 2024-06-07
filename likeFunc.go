@@ -18,9 +18,9 @@ func Like(w http.ResponseWriter, r *http.Request) {
 			likes := getPostByID(db, ID)
 			nbLikes := likes.Like + 1
 			i, err := strconv.Atoi(ID)
-    		if err != nil {
-        		log.Fatal(err)
-    		}
+			if err != nil {
+				log.Fatal(err)
+			}
 			_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
 			if err != nil {
 				log.Fatal("err rows like :", err)
@@ -60,7 +60,7 @@ func getPostByID(db *sql.DB, ID string) Post {
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Image, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
+		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
 			log.Fatal("error in reading", err)
 		}
 		output.Chanel = convertToArray(chanel)

@@ -15,7 +15,7 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 		db := OpenDb("./DATA/User_data.db")
 		defer db.Close()
 		ID := r.FormValue("ToDelID")
-		post := getPostByID(db,ID)
+		post := getPostByID(db, ID)
 		Uuid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -28,7 +28,7 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			_, err = db.Exec("DELETE FROM `post` WHERE ID =? ",i)
+			_, err = db.Exec("DELETE FROM `post` WHERE ID =? ", i)
 			if err != nil {
 				log.Fatal("err deleting post :", err)
 			}
@@ -40,7 +40,7 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 		db := OpenDb("./DATA/User_data.db")
 		defer db.Close()
 		ID := r.FormValue("ToEditID")
-		post := getPostByID(db,ID)
+		post := getPostByID(db, ID)
 		Uuid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -56,7 +56,7 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 
 			image := r.FormValue("imageEdit")
 			if image == "" {
-				image = post.Image
+				image = post.Document
 			}
 
 			chanel := convertToString(strings.Split(r.FormValue("chanelEdit"), "R/"))
@@ -68,10 +68,10 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 			if target == "" {
 				target = convertToString(post.Target)
 			}
-			
+
 			then := time.Now()
 			date := strconv.Itoa(then.Year()) + "/" + then.Month().String() + "/" + strconv.Itoa(then.Day()) + "/" + strconv.Itoa(then.Hour()) + "/" + strconv.Itoa(then.Minute()) + "/" + strconv.Itoa(then.Second())
-			
+
 			i, err := strconv.Atoi(ID)
 			if err != nil {
 				log.Fatal(err)
