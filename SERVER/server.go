@@ -3,10 +3,10 @@ package main
 import (
 	"authentification"
 	"fmt"
-	"time"
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 // main is the main function of the program.
@@ -46,7 +46,7 @@ func main() {
 				Expires: time.Now().Add(24 * time.Hour),
 			}
 			http.SetCookie(w, requestPostName)
-			
+
 			requestPostChanel := &http.Cookie{
 				Name:    "LastChanel",
 				Value:   r.FormValue("chanels"),
@@ -91,6 +91,12 @@ func main() {
 
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)
+	})
+	http.HandleFunc("/pwd", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangePwd(w, r)
+	})
+	http.HandleFunc("/username", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangeUsername(w, r)
 	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)

@@ -26,31 +26,6 @@ type Post struct {
 	Answers  []string
 }
 
-func InitDbpost(db *sql.DB) {
-	table := `CREATE TABLE IF NOT EXISTS post
-	(
-	id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
-	uuid VARCHAR(80) NOT NULL,
-	username VARCHAR(80) NOT NULL,
-	message LONG VARCHAR,
-	image VARCHAR(80),
-	date VARCHAR(80),
-	chanel VARCHAR(80),
-	target VARCHAR(80),
-	answers LONG VARCHAR,
-	like INTEGER,
-	dislike INTEGER,
-	FOREIGN KEY(uuid) 
-		REFERENCES user(uuid)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-	);`
-	_, dberr := db.Exec(table)
-	if dberr != nil {
-		log.Fatal("InitDbpost :", dberr.Error())
-	}
-}
-
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
