@@ -159,7 +159,7 @@ func getPostByID(db *sql.DB, ID string) Post {
 		var chanel string
 		var target string
 		var answers string
-		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Image, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
+		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
 			log.Fatal("error in reading", err)
 		}
 		output.Chanel = convertToArray(chanel)
