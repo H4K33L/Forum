@@ -35,14 +35,22 @@
                     <select name="like">
                         <option value="{{.ID}}"></option>
                     </select>
-                    <input type="submit" ><img src="" alt=""></input>
+                    {{ if .IsUserLikePost }}
+                        <input type="submit" style="color:blue;"><img src="" alt=""></input>
+                    {{ else }}
+                        <input type="submit" ><img src="" alt=""></input>
+                    {{ end }}
                 </form>
                 <p>dislike : {{.Dislike}}</p>
                 <form method="POST">
                     <select name="dislike">
                         <option value="{{.ID}}"></option>
                     </select>
-                    <input type="submit" ><img src="" alt=""></input>
+                    {{ if .IsUserDislikePost }}
+                    <input type="submit" style="color:red;"><img src="" alt=""></input>
+                    {{ else }}
+                        <input type="submit" ><img src="" alt=""></input>
+                    {{ end }}
                 </form>
                 <!-- a aficher sur bouton déroulant et si l'utilisateur est l'auteur des posts -->
                 {{if .IsUserMadePost}}

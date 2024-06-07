@@ -73,3 +73,18 @@ func InitDbProfile(db *sql.DB) {
 		log.Fatal("InitDbProfile :", (dberr.Error()))
 	}
 }
+
+func InitDbLike(db *sql.DB) {
+	table := `CREATE TABLE IF NOT EXISTS like
+	(
+		id INTEGER NOT NULL,
+		uuid VARCHAR(80) NOT NULL,
+		liked BOOLEAN,
+		disliked BOOLEAN,
+		PRIMARY KEY (id , uuid)
+	);`
+	_, dberr := db.Exec(table)
+	if dberr != nil {
+		log.Fatal("InitDbLike :", dberr.Error())
+	}
+}

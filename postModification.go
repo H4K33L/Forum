@@ -32,9 +32,14 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal("err deleting post :", err)
 			}
+			_, err = db.Exec("DELETE FROM like WHERE ID =?", i)
+			if err != nil {
+				log.Fatal("err deleting post :", err)
+			}
 		}
 	}
 }
+
 func PostEdit(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		db := OpenDb("./DATA/User_data.db")
