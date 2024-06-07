@@ -14,7 +14,7 @@ import (
 type Post struct {
 	ID       int
 	Uuid     string
-	UuidCookie     bool
+	IsUserMadePost     bool
 	Username string
 	Message  string
 	Image    string

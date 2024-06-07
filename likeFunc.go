@@ -9,6 +9,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func InitDbLike(db *sql.DB) {
+	table := `CREATE TABLE IF NOT EXISTS like
+	(
+	);`
+	_, dberr := db.Exec(table)
+	if dberr != nil {
+		log.Fatal("InitDbpost :", dberr.Error())
+	}
+}
+
 func Like(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		ID := r.FormValue("like")

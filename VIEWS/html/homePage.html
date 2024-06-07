@@ -45,7 +45,7 @@
                     <input type="submit" ><img src="" alt=""></input>
                 </form>
                 <!-- a aficher sur bouton déroulant et si l'utilisateur est l'auteur des posts -->
-                {{if .UuidCookie}}
+                {{if .IsUserMadePost}}
                     <form method="POST">
                         <select name="ToDelID">
                             <option value="{{.ID}}"></option>
