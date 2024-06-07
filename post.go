@@ -17,20 +17,22 @@ import (
 )
 
 type Post struct {
-	ID         int
-	Uuid       string
+	ID         			int
+	Uuid     			  string
 	PostUuid   string
-	UuidCookie bool
-	Username   string
-	Message    string
+	IsUserMadePost     	bool
+	IsUserLikePost 	bool
+	IsUserDislikePost	bool
+	Username   			string
+	Message    			string
 	Document   string
-	TypeDoc    string
-	Date       string
-	Like       int
-	Dislike    int
-	Chanel     []string
-	Target     []string
-	Answers    []string
+	TypeDoc    			string
+	Date       			string
+	Like       			int
+	Dislike    			int
+	Chanel   			  []string
+	Target   			  []string
+	Answers  			  []string
 }
 
 func UserPost(w http.ResponseWriter, r *http.Request) {

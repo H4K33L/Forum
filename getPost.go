@@ -45,7 +45,8 @@ func getPostByUser(db *sql.DB, username string, uid *http.Cookie) []Post {
 		post.Target = convertToArray(target)
 		post.Answers = convertToArray(answers)
 
-		post.UuidCookie = (uid.Value == post.Uuid)
+		post.IsUserMadePost = (uid.Value == post.Uuid)
+		post.IsUserLikePost, post.IsUserDislikePost = getLikedPost(db, post.ID, uid.Value)
 
 		output = append(output, post)
 	}
@@ -79,7 +80,7 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
 		post.Target = convertToArray(target)
 		post.Answers = convertToArray(answers)
 
-		post.UuidCookie = (uid.Value == post.Uuid)
+		post.IsUserMadePost = (uid.Value == post.Uuid)
 
 		output = append(output, post)
 	}

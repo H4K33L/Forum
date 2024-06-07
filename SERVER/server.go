@@ -72,6 +72,7 @@ func main() {
 				}
 				log.Fatal("Error retrieving cookie LastChanel :", err)
 			}
+
 			uid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {

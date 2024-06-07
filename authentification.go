@@ -34,6 +34,7 @@ func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	InitDbProfile(db)
 	InitDbpost(db)
+	InitDbLike(db)
 	defer db.Close()
 	createProfile(w, r)
 }
