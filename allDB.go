@@ -63,8 +63,6 @@ func InitDbProfile(db *sql.DB) {
 				uuid VARCHAR(80) NOT NULL UNIQUE,
 				username VARCHAR(10) NOT NULL UNIQUE,
 				profilepicture VARCHAR(80),
-				follow VARCHAR(80),
-				follower VARCHAR(80),
 				PRIMARY KEY (uuid),
 				FOREIGN KEY (uuid) 
 					REFERENCES user(uuid) 

@@ -2,20 +2,23 @@ package authentification
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type profile struct {
-	username string
-	uid      string
-	pp       string
-	follow   []string
-	follower []string
+	Username string
+	Uid      string
+	Pp       string
+	Ext      string
 }
 
 var profiles profile
@@ -48,16 +51,15 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 	booleanName, _ := VerifieNameOrEmail(username, db)
 	if booleanEmail || booleanName {
 		var userProfile profile
-		userProfile.username = username
-		userProfile.uid = uid.Value
-		follow := convertToString(userProfile.follow)
-		follower := convertToString(userProfile.follower)
-		statement, err := db.Prepare("INSERT INTO profile(uuid, username, profilepicture, follow, follower) VALUES(?, ?, ?, ?, ?)")
+		userProfile.Username = username
+		userProfile.Uid = uid.Value
+		userProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
+		statement, err := db.Prepare("INSERT INTO profile(uuid, username, profilepicture) VALUES(?, ?, ?)")
 		if err != nil {
 			fmt.Println(err)
 			log.Fatal("error Prepare new profile")
 		}
-		statement.Exec(userProfile.uid, userProfile.username, userProfile.pp, follow, follower)
+		statement.Exec(userProfile.Uid, userProfile.Username, userProfile.Pp)
 		defer db.Close()
 	}
 }
@@ -143,4 +145,57 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	openpage.Execute(w, userChangeUsername)
+}
+
+func ChangePP(w http.ResponseWriter, r *http.Request) {
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/pwd.html"))
+	var ppProfile profile
+	if r.FormValue("typedoc") == "file" {
+		file, handler, err := r.FormFile("documentFile")
+		if err != nil {
+			if err == http.ErrMissingFile {
+				fmt.Println("no file uploaded")
+				ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
+			} else {
+				log.Fatal("ppProfile image:", err)
+			}
+		} else {
+			extension := strings.LastIndex(handler.Filename, ".")
+			if extension == -1 {
+				fmt.Println("there is no extension to the file")
+			} else {
+				ext := handler.Filename[extension:]
+				e := strings.ToLower(ext)
+				if e == ".png" || e == ".jpeg" || e == ".jpg" || e == ".gif" || e == ".svg" || e == ".avif" || e == ".apng" || e == ".webp" {
+					path := "/static/stylsheet/IMAGES/PP/" + ppProfile.Uid + ext
+					if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
+						// file does not exist
+					} else {
+						e := os.Remove("./VIEWS" + path)
+						if e != nil {
+							log.Fatal(e)
+						}
+					}
+
+					f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					defer f.Close()
+					_, err = io.Copy(f, file)
+					if err != nil {
+						fmt.Println(err)
+						return
+					}
+					ppProfile.Pp = path
+					ppProfile.Ext = "file"
+				}
+			}
+		}
+	} else {
+		ppProfile.Pp = r.FormValue("document")
+		ppProfile.Ext = "url"
+	}
+	openpage.Execute(w, ppProfile)
 }

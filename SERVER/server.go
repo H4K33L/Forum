@@ -101,6 +101,9 @@ func main() {
 	http.HandleFunc("/suppression", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Delete(w, r)
 	})
+	http.HandleFunc("/pp", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangePP(w, r)
+	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }
