@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+    "slices"
 	"log"
 	"net/http"
 	"os"
@@ -188,5 +189,6 @@ func AddPost(db *sql.DB, post Post) {
 }
 
 func convertToString(array []string) string {
+	slices.Sort(array)
 	return strings.Join(array, "|\\/|-_-|\\/|+{}")
 }
