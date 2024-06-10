@@ -153,20 +153,16 @@ header {
   }
 
 aside {
-    background-color:darkgray;
-    padding: 20px;
     width: 250px;
-    height: 600px;
     align-items: center;
     justify-content: space-between;
 }
 .marge-elements {
     background-color: darkgray;
     padding: 20px;
-    width: 100%;
     height: 600px;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    place-self: center;
 }
 .bloc-element {
     background-color: white;
