@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"slices"
+	"sort"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -63,12 +63,12 @@ func convertToArray(str string) []string {
 
 func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
 	array := strings.Split(chanel, "R/")
-	slices.Sort(array)
+	sort.Strings(array)
 	chanel = convertToString(array)
 	output := []Post{}
-	UserPost, err := db.Query("SELECT * FROM post WHERE chanel LIKE %?%", chanel)
+	UserPost, err := db.Query("SELECT * FROM post WHERE chanel LIKE ?", "%"+chanel+"%")
 	if err != nil {
-		log.Fatal("error in hash")
+		log.Fatal("error in Get post request")
 	}
 	defer UserPost.Close()
 	for UserPost.Next() {
