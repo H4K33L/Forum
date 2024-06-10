@@ -148,7 +148,7 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 }
 
 func ChangePP(w http.ResponseWriter, r *http.Request) {
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/pwd.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/pp.html"))
 	var ppProfile profile
 	if r.FormValue("typedoc") == "file" {
 		file, handler, err := r.FormFile("documentFile")
