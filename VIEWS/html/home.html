@@ -16,6 +16,7 @@
                 <input placeholder="Search" type="search" class="input">
               </div>
             </div>
+            
         
         <a style="--clr: #7808d0" class="button" href="#">
             <span class="button__icon-wrapper">
@@ -30,7 +31,7 @@
             Connexion
         </a>
 
-        <div class="right-elements">
+        <div class="profil-elements">
             <a href="profil.html">
                 <div class="logo">
                     <img id="homeAvatar" src="../static/stylsheet/IMAGES/Avatar.jpg" alt="Profil_Avatar">
@@ -46,10 +47,46 @@
         <div class="bloc-element"> </div>
         <div class="bloc-element"> </div>
     </aside>
-    <div class="posts-elements"> </div>
-    <div class="articles-template"> </div>
-    <section>
+        <div class="posts-elements"> </div>
+        <div class="articles-template"> </div>
+    <section class="posts">
+        <div class="template-posts"> 
+        <form method="POST">
+            <input type="text" name="message" required autofocus placeholder="Entrez votre message">
+            <input type="url" name="image" autofocus placeholder="Placez ici l'URL de l'image">
+            <input type="text" name="chanel" required autofocus placeholder="Placez ici le canal où vous voulez poster">
+            <input type="text" name="target" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+            <input type="submit" value="Post le Post">
+        </form>
+        <form method="GET">
+            <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur">
+            <input type="text" name="chanels"autofocus  placeholder="Entrer un chanel">
+            <input type="submit" value="Find Post">
+        </form>
 
+    <content>
+        {{range .}}
+            <p>{{ .Date }}</p>
+                <img src="{{ .Image }}" >
+                <h3>{{ .Message }}</h3>
+                <p>like : {{.Like}}</p>
+                <form method="POST">
+                    <select name="like">
+                        <option value="{{.ID}}"></option>
+                    </select>
+                    <input type="submit" ><img src="" alt=""></input>
+                </form>
+                <p>dislike : {{.Dislike}}</p>
+                <form method="POST">
+                    <select name="dislike">
+                        <option value="{{.ID}}"></option>
+                    </select>
+                    <input type="submit" ><img src="" alt=""></input>
+                </form>
+        {{ end }}
+    </content>
+            
+        </div>
     </section>
 </section>
 
