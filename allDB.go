@@ -39,6 +39,7 @@ func InitDbpost(db *sql.DB) {
 	username VARCHAR(80) NOT NULL,
 	message LONG VARCHAR,
 	document VARCHAR(80),
+	ext VARCHAR(80),
 	typedoc VARCHAR(80),
 	date VARCHAR(80),
 	chanel VARCHAR(80),

@@ -58,8 +58,11 @@
                 {{if eq .TypeDoc "image"}}
                     <img src="{{ .Document }}" >
                 {{else if eq .TypeDoc "video"}}
-                    <p>video</p>
-                    <video src="{{.Document}}"></video>
+                    {{if eq .Ext "file"}}
+                        <video src="{{.Document}}" controls ></video>
+                    {{else}}
+                        <a href="{{.Document}}">{{.Document}}</a>
+                    {{end}}
                 {{end}}
                 <h3>{{ .Message }}</h3>
                 <p>like : {{.Like}}</p>

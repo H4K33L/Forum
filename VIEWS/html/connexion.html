@@ -7,10 +7,15 @@
     <!--<link href="/static/form.css" rel="stylesheet" type="text/css" >-->
 </head>
 <body>
+    <script type="module" src="../static/js/connexion.js"></script>
     <form method="POST">
         <input type="text"  name="usermailconn" required autofocus placeholder="entrer votre email ou votre pseudo">
-        <input type="password"  name="pwdconn" required autofocus placeholder="entrer un mot de passe">
+        <div class="password-container">
+            <input type="password" minlength="8" name="pwd" required autofocus placeholder="Entrer un mot de passe" id="pwd">
+            <button type="button" id="togglePassword" class="toggle-button">Afficher/Masquer</button>
+        </div>
         <input type="submit" value="se connecter">
     </form>
+    
 </body>
 </html>

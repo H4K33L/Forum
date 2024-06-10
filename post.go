@@ -17,22 +17,23 @@ import (
 )
 
 type Post struct {
-	ID         			int
-	Uuid     			  string
-	PostUuid   string
-	IsUserMadePost     	bool
-	IsUserLikePost 	bool
-	IsUserDislikePost	bool
-	Username   			string
-	Message    			string
-	Document   string
-	TypeDoc    			string
-	Date       			string
-	Like       			int
-	Dislike    			int
-	Chanel   			  []string
-	Target   			  []string
-	Answers  			  []string
+	ID                int
+	Uuid              string
+	PostUuid          string
+	IsUserMadePost    bool
+	IsUserLikePost    bool
+	IsUserDislikePost bool
+	Username          string
+	Message           string
+	Document          string
+	TypeDoc           string
+	Ext               string
+	Date              string
+	Like              int
+	Dislike           int
+	Chanel            []string
+	Target            []string
+	Answers           []string
 }
 
 func UserPost(w http.ResponseWriter, r *http.Request) {
@@ -105,11 +106,13 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 								return
 							}
 							post.Document = path
+							post.Ext = "file"
 						}
 					}
 				}
 			} else {
 				post.Document = r.FormValue("document")
+				post.Ext = "url"
 			}
 		} else if r.FormValue("type") == "video" {
 			post.TypeDoc = "video"
@@ -130,33 +133,36 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 						ext := handler.Filename[extension:]
 						e := strings.ToLower(ext)
 						if e == ".mp4" || e == ".webm" || e == ".ogg" {
-							path := "/VIEWS/static/stylsheet/VIDEO/" + post.PostUuid + ext
-							if _, err := os.Stat("." + path); errors.Is(err, os.ErrNotExist) {
+							path := "/static/stylsheet/VIDEO/" + post.PostUuid + ext
+							if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
 								// file does not exist
 							} else {
-								e := os.Remove("." + path)
+								e := os.Remove("./VIEWS" + path)
 								if e != nil {
 									log.Fatal(e)
 								}
 							}
 
-							f, err := os.OpenFile("."+path, os.O_WRONLY|os.O_CREATE, 0666)
+							f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 							if err != nil {
 								fmt.Println(err)
 								return
 							}
 							defer f.Close()
 							io.Copy(f, file)
-							post.Document = "." + path
+							post.Document = path
+							post.Ext = "file"
 						}
 					}
 				}
 			} else {
 				post.Document = r.FormValue("document")
+				post.Ext = "url"
 			}
 		} else {
 			post.TypeDoc = ""
 			post.Document = ""
+			post.Ext = ""
 		}
 
 		then := time.Now()
@@ -170,14 +176,14 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddPost(db *sql.DB, post Post) {
-	statement, err := db.Prepare("INSERT INTO post(uuid, postuuid, username, message, document, typedoc, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	statement, err := db.Prepare("INSERT INTO post(uuid, postuuid, username, message, document, ext, typedoc, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal("sql add post", err)
 	}
 	chanel := convertToString(post.Chanel)
 	target := convertToString(post.Target)
 	answers := convertToString(post.Answers)
-	statement.Exec(post.Uuid, post.PostUuid, post.Username, post.Message, post.Document, post.TypeDoc, post.Date, chanel, target, answers, post.Like, post.Dislike)
+	statement.Exec(post.Uuid, post.PostUuid, post.Username, post.Message, post.Document, post.Ext, post.TypeDoc, post.Date, chanel, target, answers, post.Like, post.Dislike)
 	defer db.Close()
 }
 
