@@ -17,6 +17,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+/*
+This structure is used acros the project to represent a post.
+*/
 type Post struct {
 	ID                int
 	Uuid              string
@@ -37,6 +40,15 @@ type Post struct {
 	Answers           []string
 }
 
+/*
+The function http request and http respose, get the information in the 
+form Post to create a post struct and user the function AddPost to add 
+the post to db.
+
+input : w http.ResponseWriter, r *http.Request
+
+output : nothing
+*/
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -45,15 +57,15 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found userpost")
+				log.Fatal("UserPost, cookie not found userpost :", err)
 			}
-			log.Fatal("Error retrieving cookie uuid :", err)
+			log.Fatal("UserPost, Error retrieving cookie uuid :", err)
 		}
 		var username string
 		err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("sql user post :", err1)
+				log.Fatal("UserPost, sql user post :", err1)
 			}
 			log.Fatal(err1)
 		}
@@ -62,7 +74,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Message = r.FormValue("message")
 		u, err := uuid.NewV4()
 		if err != nil {
-			log.Fatalf("failed to generate UUID: %v", err)
+			log.Fatalf("UserPost, failed to generate UUID: %v", err)
 		}
 		post.PostUuid = u.String()
 		if r.FormValue("type") == "image" {
@@ -74,7 +86,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 						fmt.Println("no file uploaded")
 						post.Document = ""
 					} else {
-						log.Fatal("post image:", err)
+						log.Fatal("UserPost, post image:", err)
 					}
 
 				} else {
@@ -171,23 +183,39 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Chanel = strings.Split(r.FormValue("chanel"), "R/")
 		post.Target = strings.Split(r.FormValue("target"), "\\\\")
 		if r.FormValue("chanel") != "" {
-			AddPost(OpenDb("./DATA/User_data.db"), post)
+			db := OpenDb("./DATA/User_data.db")
+			defer db.Close()
+			AddPost(db, post)
 		}
 	}
 }
 
+/*
+The function take db an post as argument and insert post in db.
+
+input : db *sql.DB, post Post
+
+output : none
+*/
 func AddPost(db *sql.DB, post Post) {
 	statement, err := db.Prepare("INSERT INTO post(uuid, postuuid, username, message, document, ext, typedoc, date, chanel, target, answers, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		log.Fatal("sql add post", err)
+		log.Fatal("AddPost, sql add post", err)
 	}
 	chanel := convertToString(post.Chanel)
 	target := convertToString(post.Target)
 	answers := convertToString(post.Answers)
 	statement.Exec(post.Uuid, post.PostUuid, post.Username, post.Message, post.Document, post.Ext, post.TypeDoc, post.Date, chanel, target, answers, post.Like, post.Dislike)
-	defer db.Close()
 }
 
+/*
+The function take an array of sting and convert it to sting whith "|\\/|-_-|\\/|+{}" joiner,
+this function is only suposed to be used to convert array of string in string to be stocked in db.
+
+input : array []string
+
+output : string
+*/
 func convertToString(array []string) string {
 	sort.Strings(array)
 	return strings.Join(array, "|\\/|-_-|\\/|+{}")
