@@ -10,6 +10,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+/*
+The function http request and http respose, get the information in the 
+form postSupr and delete the post concerned.
+
+input : w http.ResponseWriter, r *http.Request
+
+output : nothing
+*/
 func PostSupr(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		db := OpenDb("./DATA/User_data.db")
@@ -19,9 +27,9 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 		Uuid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found Uuid")
+				log.Fatal("PostSupr, cookie not found Uuid :", err)
 			}
-			log.Fatal("Error retrieving cookie Uuid :", err)
+			log.Fatal("PostSupr, Error retrieving cookie Uuid :", err)
 		}
 		if ID != "" && post.Uuid == Uuid.Value {
 			i, err := strconv.Atoi(ID)
@@ -30,16 +38,24 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 			}
 			_, err = db.Exec("DELETE FROM `post` WHERE ID =? ", i)
 			if err != nil {
-				log.Fatal("err deleting post :", err)
+				log.Fatal("PostSupr, err deleting post :", err)
 			}
 			_, err = db.Exec("DELETE FROM like WHERE ID =?", i)
 			if err != nil {
-				log.Fatal("err deleting post :", err)
+				log.Fatal("PostSupr, err deleting post :", err)
 			}
 		}
 	}
 }
 
+/*
+The function http request and http respose, get the information in the 
+form Edit and edit the post concerned with the modification chose by the user.
+
+input : w http.ResponseWriter, r *http.Request
+
+output : nothing
+*/
 func PostEdit(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		db := OpenDb("./DATA/User_data.db")
@@ -49,9 +65,9 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 		Uuid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found Uuid")
+				log.Fatal("PostEdit, cookie not found Uuid :", err)
 			}
-			log.Fatal("Error retrieving cookie Uuid :", err)
+			log.Fatal("PostEdit, Error retrieving cookie Uuid :", err)
 		}
 		if ID != "" && post.Uuid == Uuid.Value {
 			message := r.FormValue("messageEdit")
@@ -83,7 +99,7 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 			}
 			_, err = db.Exec("UPDATE post SET message =?, image =?, date =?, chanel =?, target =? WHERE ID =? ", message, image, date, chanel, target, i)
 			if err != nil {
-				log.Fatal("err Editing post :", err)
+				log.Fatal("PostEdit, err Editing post :", err)
 			}
 		}
 	}
