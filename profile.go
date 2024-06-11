@@ -23,30 +23,52 @@ type profile struct {
 
 var profiles profile
 
+/*
+Profile(w, r)
+
+This function retrieves and displays the user's profile.
+It retrieves the user's UUID from a cookie and queries the database to fetch the profile information.
+
+Input: w : http.ResponseWriter, used to write the HTTP response. /// r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func Profile(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
+	defer db.Close()
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("cookie not found createProfile")
+			log.Fatal("profile cookie not found :", err)
 		}
-		log.Fatal("Error retrieving cookie UUID:", err)
+		log.Fatal("profile Error retrieving cookie UUID:", err)
 	}
 	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles)
 	if err1 != nil {
 		if err1 == sql.ErrNoRows {
-			log.Fatal("sql connexion :", err1)
+			log.Fatal("profile sql :", err1)
 		}
 		log.Fatal(err1)
 	}
-	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/profilePage.html"))
-	// execute the modification of the page
 	openpage.Execute(w, profiles)
 }
 
+// createProfile(w, r)
+//
+// This function creates a user profile when an account is created.
+// It uses a cookie to retrieve the user's UUID and interacts with the database to store the profile information.
+//
+// Input :
+//
+// w : http.ResponseWriter, used to write the HTTP response.
+//
+// r : *http.Request, used to read the HTTP request.
+//
+// Output : none/
 func createProfile(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
+	defer db.Close()
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
@@ -75,10 +97,24 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 			log.Fatal("error Prepare new profile")
 		}
 		statement.Exec(userProfile.Uid, userProfile.Username, userProfile.Pp)
-		defer db.Close()
+
 	}
 }
 
+/*
+ChangePwd(w, r)
+
+This function handles the password change process for a user.
+It serves an HTML form for changing the password and processes the form submission.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func ChangePwd(w http.ResponseWriter, r *http.Request) {
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/pwd.html"))
 	var userChangePwd user
@@ -123,6 +159,20 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, userChangePwd)
 }
 
+/*
+ChangeUsername(w, r)
+
+This function handles the username change process for a user.
+It serves an HTML form for changing the username and processes the form submission.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/username.html"))
 	var userChangeUsername user
@@ -162,6 +212,21 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, userChangeUsername)
 }
 
+/*
+ChangePP(w, r)
+
+This function handles the process of changing the user's profile picture.
+It allows the user to upload a new profile picture or provide a URL to an existing one,
+and updates the profile picture information in the database accordingly.
+
+Input: w :
+
+http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func ChangePP(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	uid, err := r.Cookie("UUID")

@@ -5,6 +5,20 @@ import (
 	"log"
 )
 
+/*
+OpenDb(path string) *sql.DB
+
+This function opens a connection to an SQLite database located at the specified path.
+It enables foreign key support for the database.
+
+Input:
+
+path : string, the path to the SQLite database file.
+
+Output:
+
+*sql.DB : a pointer to the database connection.
+*/
 func OpenDb(path string) *sql.DB {
 	db, err := sql.Open("sqlite3", path+"?_foreign_keys=on")
 	if err != nil {
@@ -16,6 +30,17 @@ func OpenDb(path string) *sql.DB {
 	return db
 }
 
+/*
+InitDb(db *sql.DB)
+
+This function initializes the database schema by creating the necessary tables if they do not exist already.
+
+Input:
+
+db : *sql.DB, a pointer to the database connection.
+
+Output: none
+*/
 func InitDb(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS user (
 				uuid VARCHAR(80) NOT NULL UNIQUE,
@@ -29,6 +54,18 @@ func InitDb(db *sql.DB) {
 		log.Fatal("InitDb :", (dberr.Error()))
 	}
 }
+
+/*
+InitDbpost(db *sql.DB)
+
+This function initializes the database schema by creating the necessary tables for posts if they do not exist already.
+
+Input:
+
+db : *sql.DB, a pointer to the database connection.
+
+Output: none
+*/
 
 func InitDbpost(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS post
@@ -58,6 +95,17 @@ func InitDbpost(db *sql.DB) {
 	}
 }
 
+/*
+InitDbProfile(db *sql.DB)
+
+This function initializes the database schema by creating the necessary tables for profiles if they do not exist already.
+
+Input:
+
+db : *sql.DB, a pointer to the database connection.
+
+Output: none
+*/
 func InitDbProfile(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS profile (
 				uuid VARCHAR(80) NOT NULL UNIQUE,
@@ -75,6 +123,17 @@ func InitDbProfile(db *sql.DB) {
 	}
 }
 
+/*
+InitDbLike(db *sql.DB)
+
+This function initializes the database schema by creating the necessary tables for likes if they do not exist already.
+
+Input:
+
+db : *sql.DB, a pointer to the database connection.
+
+Output: none
+*/
 func InitDbLike(db *sql.DB) {
 	table := `CREATE TABLE IF NOT EXISTS like
 	(

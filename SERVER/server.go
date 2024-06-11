@@ -9,7 +9,19 @@ import (
 	"time"
 )
 
-// main is the main function of the program.
+/*
+main()
+
+This is the main function of the application. It initializes the database, sets up HTTP routes,
+and starts the HTTP server to handle incoming requests.
+
+It initializes the database, sets up HTTP routes for various functionalities like user authentication,
+profile management, post management, etc., and starts the HTTP server to listen on port 8080.
+
+The function also serves static files for resources like CSS, JavaScript, etc.
+
+Output: none
+*/
 func main() {
 	db := authentification.OpenDb("./DATA/User_data.db")
 	authentification.InitDb(db)
