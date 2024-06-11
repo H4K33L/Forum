@@ -24,6 +24,21 @@ type profile struct {
 var profiles profile
 
 func Profile(w http.ResponseWriter, r *http.Request) {
+	db := OpenDb("./DATA/User_data.db")
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			log.Fatal("cookie not found createProfile")
+		}
+		log.Fatal("Error retrieving cookie UUID:", err)
+	}
+	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles)
+	if err1 != nil {
+		if err1 == sql.ErrNoRows {
+			log.Fatal("sql connexion :", err1)
+		}
+		log.Fatal(err1)
+	}
 	// open the first web page openPage.html
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/profilePage.html"))
 	// execute the modification of the page
@@ -148,6 +163,14 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 }
 
 func ChangePP(w http.ResponseWriter, r *http.Request) {
+	db := OpenDb("./DATA/User_data.db")
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			log.Fatal("cookie not found createProfile")
+		}
+		log.Fatal("Error retrieving cookie UUID:", err)
+	}
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/pp.html"))
 	var ppProfile profile
 	if r.FormValue("typedoc") == "file" {
@@ -196,6 +219,10 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		ppProfile.Pp = r.FormValue("document")
 		ppProfile.Ext = "url"
+	}
+	_, err = db.Exec("UPDATE profile SET profilepicture =? WHERE UUID =? ", ppProfile.Pp, uid.Value)
+	if err != nil {
+		log.Fatal("err rows profile :", err)
 	}
 	openpage.Execute(w, ppProfile)
 }
