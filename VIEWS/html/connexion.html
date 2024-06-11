@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitsune</title>
     <!--<link href="/static/form.css" rel="stylesheet" type="text/css" >-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
+    <script type="module" src="../static/js/connexion.js"></script>
     <form method="POST">
         <input type="text"  name="usermailconn" required autofocus placeholder="entrer votre email ou votre pseudo">
-        <input type="password"  name="pwdconn" required autofocus placeholder="entrer un mot de passe">
+        <div class="password-container">
+            <input type="password" minlength="8" name="pwd" required autofocus placeholder="Entrer un mot de passe" id="pwd">
+            <button type="button" id="togglePassword" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
+        </div>
         <input type="submit" value="se connecter">
     </form>
+    
 </body>
 </html>

@@ -6,9 +6,22 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
-// main is the main function of the program.
+/*
+main()
+
+This is the main function of the application. It initializes the database, sets up HTTP routes,
+and starts the HTTP server to handle incoming requests.
+
+It initializes the database, sets up HTTP routes for various functionalities like user authentication,
+profile management, post management, etc., and starts the HTTP server to listen on port 8080.
+
+The function also serves static files for resources like CSS, JavaScript, etc.
+
+Output: none
+*/
 func main() {
 	db := authentification.OpenDb("./DATA/User_data.db")
 	authentification.InitDb(db)
@@ -31,9 +44,57 @@ func main() {
 	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Compte(w, r)
 		authentification.UserPost(w, r)
-		posts := authentification.GetPost(w, r)
 		authentification.Like(w, r)
 		authentification.Dislike(w, r)
+		authentification.PostSupr(w, r)
+		authentification.PostEdit(w, r)
+
+		var posts []authentification.Post
+		if authentification.GetPost(w, r) != nil {
+			requestPostName := &http.Cookie{
+				Name:    "LastUsername",
+				Value:   r.FormValue("username"),
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, requestPostName)
+
+			requestPostChanel := &http.Cookie{
+				Name:    "LastChanel",
+				Value:   r.FormValue("chanels"),
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, requestPostChanel)
+
+			posts = authentification.GetPost(w, r)
+		} else {
+			lastUsername, err := r.Cookie("LastUsername")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found LastUsername")
+				}
+				log.Fatal("Error retrieving cookie LastUsername :", err)
+			}
+
+			lastChanel, err := r.Cookie("LastChanel")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found LastChanel")
+				}
+				log.Fatal("Error retrieving cookie LastChanel :", err)
+			}
+
+			uid, err := r.Cookie("UUID")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					log.Fatal("cookie not found userpost")
+				}
+				log.Fatal("Error retrieving cookie uuid :", err)
+			}
+			posts = authentification.GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid)
+		}
+
 		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
 		if err := openpage.Execute(w, posts); err != nil {
 			log.Fatal("erreur lors de l'envois ", err)
@@ -42,6 +103,18 @@ func main() {
 
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		authentification.Profile(w, r)
+	})
+	http.HandleFunc("/pwd", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangePwd(w, r)
+	})
+	http.HandleFunc("/username", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangeUsername(w, r)
+	})
+	http.HandleFunc("/suppression", func(w http.ResponseWriter, r *http.Request) {
+		authentification.Delete(w, r)
+	})
+	http.HandleFunc("/pp", func(w http.ResponseWriter, r *http.Request) {
+		authentification.ChangePP(w, r)
 	})
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)

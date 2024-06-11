@@ -25,30 +25,21 @@ type user struct {
 
 var users user
 
-func OpenDb(path string) *sql.DB {
-	db, err := sql.Open("sqlite3", path)
-	if err != nil {
-		log.Fatal("OpenDb 1:", err)
-	}
-	if err = db.Ping(); err != nil {
-		log.Fatal("OpenDb 2:", err)
-	}
-	return db
-}
+/*
+Accueil(w, r)
 
-func InitDb(db *sql.DB) {
-	table := `CREATE TABLE IF NOT EXISTS user (
-				uuid VARCHAR(80) NOT NULL UNIQUE,
-				email VARCHAR(80) NOT NULL UNIQUE,
-				username VARCHAR(10) NOT NULL UNIQUE,
-				pwd VARCHAR(255) NOT NULL
-			);`
-	_, dberr := db.Exec(table)
-	if dberr != nil {
-		log.Fatal("InitDb :", (dberr.Error()))
-	}
-}
+This function serves the homepage of the application.
+It renders the HTML template for the homepage and passes user data to it for rendering.
 
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output:
+none
+*/
 func Accueil(w http.ResponseWriter, r *http.Request) {
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
 	openpage.Execute(w, users)
@@ -58,10 +49,26 @@ func Compte(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	InitDbProfile(db)
 	InitDbpost(db)
+	InitDbLike(db)
 	defer db.Close()
 	createProfile(w, r)
 }
 
+/*
+Adduser(db *sql.DB, user user) string
+
+This function adds a new user to the database.
+It prepares and executes an SQL statement to insert the user's information into the database.
+
+Input:
+
+db : *sql.DB, a pointer to the database connection.
+
+user : user, the user object containing user information.
+
+Output:
+string, an empty string if the operation is successful, otherwise an error message.
+*/
 func Adduser(db *sql.DB, user user) string {
 	statement, err := db.Prepare("INSERT INTO user(uuid, email, username, pwd) VALUES(?, ?, ?, ?)")
 	if err != nil {
@@ -72,6 +79,20 @@ func Adduser(db *sql.DB, user user) string {
 	return ""
 }
 
+/*
+Connexion(w, r)
+
+This function handles the user login process.
+It renders the HTML template for the login page and processes the login form submission.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func Connexion(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -90,7 +111,6 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			uid = cookieUuid
 		} else {
-			// Si une autre erreur s'est produite
 			log.Fatal("Error retrieving cookie 'uuid' :", err)
 		}
 	}
@@ -141,6 +161,20 @@ func Connexion(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, users)
 }
 
+/*
+Inscription(w, r)
+
+This function handles the user registration process.
+It renders the HTML template for the registration page and processes the registration form submission.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func Inscription(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -157,7 +191,6 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalf("failed to generate UUID: %v", err)
 		}
-		//log.Printf("generated Version 4 UUID %v", u)
 		booleanEmail, _ := VerifieNameOrEmail(newEmail, db)
 		booleanName, _ := VerifieNameOrEmail(newUserName, db)
 		if newPwd != newPwd2 {
@@ -199,6 +232,24 @@ func Inscription(w http.ResponseWriter, r *http.Request) {
 	openpage.Execute(w, users)
 }
 
+/*
+VerifieNameOrEmail(Input string, db *sql.DB) (bool, error)
+
+This function checks if the given input (either username or email) already exists in the database.
+It queries the database to search for a matching username or email.
+
+Input:
+
+Input : string, the username or email to be checked.
+
+db : *sql.DB, a pointer to the database connection.
+
+Output:
+
+bool : true if the username or email already exists, false otherwise.
+
+error : an error if there is an issue with the database query.
+*/
 func VerifieNameOrEmail(Input string, db *sql.DB) (bool, error) {
 	var NameOrEmail string
 	err := db.QueryRow("SELECT username FROM user WHERE email=? OR username=?", Input, Input).Scan(&NameOrEmail)
@@ -211,6 +262,24 @@ func VerifieNameOrEmail(Input string, db *sql.DB) (bool, error) {
 	return true, nil
 }
 
+/*
+IsUserCreate(Input string, db *sql.DB) (bool, error)
+
+This function checks if a user with the given UUID exists in the database.
+It queries the database to search for a matching UUID.
+
+Input:
+
+Input : string, the UUID to be checked.
+
+db : *sql.DB, a pointer to the database connection.
+
+Output:
+
+bool : true if the user with the given UUID exists, false otherwise.
+
+error : an error if there is an issue with the database query.
+*/
 func IsUserCreate(Input string, db *sql.DB) (bool, error) {
 	var uuid string
 	err := db.QueryRow("SELECT username FROM user WHERE uuid=?", Input).Scan(&uuid)
@@ -223,6 +292,26 @@ func IsUserCreate(Input string, db *sql.DB) (bool, error) {
 	return true, nil
 }
 
+/*
+VerifiePwd(Input string, Password string, db *sql.DB) (bool, error)
+
+This function verifies if the provided password matches the hashed password stored in the database for the given username or email.
+It queries the database to retrieve the hashed password for the provided username or email and then compares it with the provided password.
+
+Input:
+
+Input : string, the username or email for which the password needs to be verified.
+
+Password : string, the password to be verified.
+
+db : *sql.DB, a pointer to the database connection.
+
+Output:
+
+bool : true if the provided password matches the hashed password, false otherwise.
+
+error : an error if there is an issue with the database query.
+*/
 func VerifiePwd(Input string, Password string, db *sql.DB) (bool, error) {
 	var hashedPwd string
 	err := db.QueryRow("SELECT pwd FROM user WHERE email=? OR username=?", Input, Input).Scan(&hashedPwd)
@@ -235,16 +324,60 @@ func VerifiePwd(Input string, Password string, db *sql.DB) (bool, error) {
 	return CheckPasswordHash(Password, hashedPwd), nil
 }
 
+/*
+HashPassword(password string) (string, error)
+
+This function hashes the provided password using bcrypt with a cost factor of 14.
+
+Input:
+
+password : string, the password to be hashed.
+
+Output:
+
+string : the hashed password.
+
+error : an error if there is an issue during the hashing process.
+*/
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
+/*
+CheckPasswordHash(password, hash string) bool
+
+This function compares a password with its hashed version to verify if they match.
+
+Input:
+
+password : string, the password to be checked.
+
+hash : string, the hashed password to compare against.
+
+Output:
+
+bool : true if the password matches the hashed version, false otherwise.
+*/
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+/*
+Deconnexion(w http.ResponseWriter, r *http.Request)
+
+This function handles the user logout process.
+It clears the UUID cookie, effectively logging out the user, and redirects them to the home page.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
 func Deconnexion(w http.ResponseWriter, r *http.Request) {
 	cookieUuid := &http.Cookie{
 		Name:    "UUID",
@@ -256,6 +389,20 @@ func Deconnexion(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/accueil", http.StatusSeeOther)
 }
 
+/*
+isCorrectPassword(password string) bool
+
+This function checks if the provided password meets the criteria for being considered secure.
+It verifies if the password contains at least one uppercase letter, one lowercase letter, one digit, and one special character.
+
+Input:
+
+password : string, the password to be checked.
+
+Output:
+
+bool : true if the password meets the criteria, false otherwise.
+*/
 func isCorrectPassword(password string) bool {
 	var hasUpper, hasLower, hasDigit, hasSpecial bool
 	for _, char := range password {
@@ -271,4 +418,44 @@ func isCorrectPassword(password string) bool {
 		}
 	}
 	return hasUpper && hasLower && hasDigit && hasSpecial
+}
+
+/*
+Delete(w http.ResponseWriter, r *http.Request)
+
+This function handles the deletion of a user account.
+It first retrieves the UUID cookie from the request, then deletes the user from the database using the UUID.
+After deletion, it clears the UUID cookie and redirects the user to the home page.
+
+Input:
+
+w : http.ResponseWriter, used to write the HTTP response.
+
+r : *http.Request, used to read the HTTP request.
+
+Output: none
+*/
+func Delete(w http.ResponseWriter, r *http.Request) {
+	db := OpenDb("./DATA/User_data.db")
+	defer db.Close()
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			cookieUuid := &http.Cookie{
+				Name:    "UUID",
+				Value:   "",
+				Path:    "/",
+				Expires: time.Now().Add(24 * time.Hour),
+			}
+			http.SetCookie(w, cookieUuid)
+			uid = cookieUuid
+		} else {
+			log.Fatal("Error retrieving cookie 'uuid' :", err)
+		}
+	}
+	_, err = db.Exec("DELETE FROM user WHERE uuid=?", uid.Value)
+	if err != nil {
+		fmt.Println("err delete :", err)
+	}
+	Deconnexion(w, r)
 }
