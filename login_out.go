@@ -253,8 +253,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		// Retrieve the registration information from the form.
 		newEmail := r.FormValue("usermail")
 		newUserName := r.FormValue("username")
-		newPwd := r.FormValue("pwd")
-		newPwd2 := r.FormValue("pwd2")
+		newPwd := r.FormValue("pwdsignup")
+		newPwd2 := r.FormValue("pwdsignup2")
 
 		// Generate a UUID for the new user.
 		u, err := uuid.NewV4()

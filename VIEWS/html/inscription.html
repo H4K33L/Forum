@@ -10,16 +10,17 @@
 <body>
     <script type="module" src="../static/js/inscription.js"></script>
     <section class="box">
+        <img src="../static/stylsheet/IMAGES/KitsuneGrand.png" class="Kitsune">
         <h1>inscription</h1>
         <form method="POST">
             <input type="email" name="usermail" required autofocus placeholder="entrer votre email" class="entry">
             <input type="text" name="username" required autofocus placeholder="entrer votre pseudo" maxlength="10" class="entry">
             <article class="password-container">
-                <input type="password" minlength="8" name="pwd" required autofocus placeholder="Entrer un mot de passe" id="pwd" class="entry">
+                <input type="password" minlength="8" name="pwdsignup" required autofocus placeholder="Entrer un mot de passe" id="pwd" class="entry">
                 <button type="button" id="togglePassword" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
             </article>
             <article class="password-container">
-                <input type="password" minlength="8" name="pwd2" required autofocus placeholder="Réécrire le mot de passe" id="pwd2" class="entry">
+                <input type="password" minlength="8" name="pwdsignup2" required autofocus placeholder="Réécrire le mot de passe" id="pwd2" class="entry">
                 <button type="button" id="togglePassword2" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
             </article>
             <input type="submit" value="s'inscrire" class="btn">
