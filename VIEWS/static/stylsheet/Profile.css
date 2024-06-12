@@ -71,6 +71,7 @@ aside {
     align-items: center;
     justify-content: center;
     position: sticky;
+
     
 }
 .grid-item.b.inner-container{
@@ -84,6 +85,7 @@ aside {
     justify-content: flex-end;
     width: 100%;
     gap:50px;
+    margin: 20px;
 }
 
 /* CSS pour le champ de recherche */
@@ -93,7 +95,7 @@ aside {
     align-items: center;
     position: relative;
     width: 400px;
-}
+}   
 
 .group2 {
     display: flex;
@@ -233,6 +235,8 @@ aside {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #FF6440;
+    margin: 15px;
+    height: 525px;
 }
 
 /* Styles pour le logo */
@@ -275,5 +279,5 @@ aside {
 }
 
 .card__btn:hover {
-    background-color: #0056b3;
+    background-color: black;
 }
