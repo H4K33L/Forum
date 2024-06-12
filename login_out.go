@@ -39,10 +39,10 @@ Output:
 none
 */
 func HomePage(w http.ResponseWriter, r *http.Request) {
-	/*if r.URL.Path != "/account" {
+	if r.URL.Path != "/" {
 		http.Redirect(w, r, "/404", http.StatusSeeOther)
 		return
-	}*/
+	}
 	// Parse the HTML template named "accueil.html".
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
 
@@ -66,10 +66,6 @@ Output:
 none
 */
 func Account(w http.ResponseWriter, r *http.Request) {
-	/*if r.URL.Path != "/account" {
-		http.Redirect(w, r, "/404", http.StatusSeeOther)
-		return
-	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	// Initialize database tables if they don't exist.
@@ -126,10 +122,6 @@ r : *http.Request, used to read the HTTP request.
 Output: none
 */
 func Login(w http.ResponseWriter, r *http.Request) {
-	/*if r.URL.Path != "/account" {
-		http.Redirect(w, r, "/404", http.StatusSeeOther)
-		return
-	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -166,7 +158,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// If the user is already logged in and has a profile, redirect to the account page.
 	if uid.Value != "" && iscreate {
-		http.Redirect(w, r, "/compte", http.StatusSeeOther)
+		http.Redirect(w, r, "/account", http.StatusSeeOther)
 	} else if r.Method == "POST" {
 		// If the request method is POST, it means the user is attempting to log in.
 
@@ -209,7 +201,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				Expires: time.Now().Add(24 * time.Hour),
 			}
 			http.SetCookie(w, cookieUuid)
-			http.Redirect(w, r, "/compte", http.StatusSeeOther)
+			http.Redirect(w, r, "/account", http.StatusSeeOther)
 		} else {
 			fmt.Println("authentification connexion  this account does not exist")
 		}
@@ -233,10 +225,6 @@ r : *http.Request, used to read the HTTP request.
 Output: none
 */
 func Signup(w http.ResponseWriter, r *http.Request) {
-	/*if r.URL.Path != "/account" {
-		http.Redirect(w, r, "/404", http.StatusSeeOther)
-		return
-	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -297,7 +285,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 					Expires: time.Now().Add(24 * time.Hour),
 				}
 				http.SetCookie(w, cookieUuid)
-				http.Redirect(w, r, "/compte", http.StatusSeeOther)
+				http.Redirect(w, r, "/account", http.StatusSeeOther)
 				return
 			} else {
 				fmt.Println("error in adduser")
@@ -332,7 +320,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(24 * time.Hour),
 	}
 	http.SetCookie(w, cookieUuid)
-	http.Redirect(w, r, "/accueil", http.StatusSeeOther) // Redirection vers la page d'accueil
+	http.Redirect(w, r, "/", http.StatusSeeOther) // Redirection vers la page d'accueil
 }
 
 /*
