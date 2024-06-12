@@ -50,6 +50,7 @@ func main() {
 	http.HandleFunc("/username", client.ChangeUsername)
 	http.HandleFunc("/delete", client.Delete)
 	http.HandleFunc("/pp", client.ChangePP)
+	http.HandleFunc("/404", client.Error404)
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }
