@@ -35,7 +35,7 @@ func Like(w http.ResponseWriter, r *http.Request) {
 			Uuid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {
-					fmt.Println("likefunc Like, cookie not found Uuid", err)
+					fmt.Println("likefunc Like, cookie not found Uuid :", err)
 					http.Redirect(w, r, "/500", http.StatusSeeOther)
 					return
 				}
@@ -116,7 +116,7 @@ func Like(w http.ResponseWriter, r *http.Request) {
 				// Insert a new like entry in the like table
 				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
 				if err != nil {
-					fmt.Println("likefunc Like, sql add post", err)
+					fmt.Println("likefunc Like, sql add post :", err)
 					http.Redirect(w, r, "/500", http.StatusSeeOther)
 					return
 				}
@@ -153,7 +153,7 @@ func Dislike(w http.ResponseWriter, r *http.Request) {
 			Uuid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {
-					fmt.Println("likefunc Dislike, cookie not found Uuid", err)
+					fmt.Println("likefunc Dislike, cookie not found Uuid :", err)
 					http.Redirect(w, r, "/500", http.StatusSeeOther)
 					return
 				}
@@ -234,7 +234,7 @@ func Dislike(w http.ResponseWriter, r *http.Request) {
 				// Insert a new like entry in the like table
 				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
 				if err != nil {
-					fmt.Println("likefunc Dislike, sql add like", err)
+					fmt.Println("likefunc Dislike, sql add like :", err)
 					http.Redirect(w, r, "/500", http.StatusSeeOther)
 					return
 				}

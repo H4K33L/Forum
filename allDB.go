@@ -25,13 +25,13 @@ func OpenDb(path string, w http.ResponseWriter, r *http.Request) *sql.DB {
 	db, err := sql.Open("sqlite3", path+"?_foreign_keys=on")
 	// Check if there was an error opening the database connection.
 	if err != nil {
-		fmt.Println(" allDB OpenDb 1:", err)
+		fmt.Println("allDB OpenDb 1 :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return nil
 	}
 	// Ping the database to ensure the connection is valid.
 	if err = db.Ping(); err != nil {
-		fmt.Println("allDB OpenDb 2:", err)
+		fmt.Println("allDB OpenDb 2 :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return nil
 	}

@@ -57,7 +57,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				fmt.Println(" post UserPost, cookie not found userpost :", err)
+				fmt.Println("post UserPost, cookie not found userpost :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
@@ -74,7 +74,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("post userpost error scan:", err1)
+			fmt.Println("post userpost, error scan :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -84,7 +84,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Message = r.FormValue("message")
 		u, err := uuid.NewV4()
 		if err != nil {
-			fmt.Println("post UserPost, failed to generate UUID: %v", err)
+			fmt.Println("post UserPost, failed to generate UUID : %v", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -102,7 +102,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					if err == http.ErrMissingFile {
 						post.Document = ""
 					} else {
-						fmt.Println("post UserPost, post image:", err)
+						fmt.Println("post UserPost, post image :", err)
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					}
@@ -110,7 +110,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					// Extract the file extension and validate it
 					extension := strings.LastIndex(handler.Filename, ".")
 					if extension == -1 {
-						fmt.Println("post UserPost image : there is no extension to the file")
+						fmt.Println("post UserPost, image : there is no extension to the file")
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					} else {
@@ -122,13 +122,13 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							path := "/static/stylsheet/IMAGES/POST/" + post.PostUuid + ext
 							// Check if the file already exists and remove it
 							if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-								fmt.Println("post userpost no extension os.error :", err)
+								fmt.Println("post userpost, no extension os.error :", err)
 								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							} else {
 								err = os.Remove("./VIEWS" + path)
 								if err != nil {
-									fmt.Println("post userpost can't remove the path :", err)
+									fmt.Println("post userpost, can't remove the path :", err)
 									http.Redirect(w, r, "/500", http.StatusSeeOther)
 									return
 								}
@@ -137,7 +137,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							// Create and open the file for writing
 							f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 							if err != nil {
-								fmt.Println("post userpost can't open the file :", err)
+								fmt.Println("post userpost, can't open the file :", err)
 								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							}
@@ -145,7 +145,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							// Copy the uploaded file data to the destination file
 							_, err = io.Copy(f, file)
 							if err != nil {
-								fmt.Println("post userpost can't copy the file :", err)
+								fmt.Println("post userpost, can't copy the file :", err)
 								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							}
@@ -172,7 +172,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					if err == http.ErrMissingFile {
 						post.Document = ""
 					} else {
-						fmt.Println("post userpost video :", err)
+						fmt.Println("post userpost, video :", err)
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					}
@@ -180,7 +180,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					// Extract the file extension and validate it
 					extension := strings.LastIndex(handler.Filename, ".")
 					if extension == -1 {
-						fmt.Println("post user post video : there is no extension to the file")
+						fmt.Println("post userpost, video : there is no extension to the file")
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					} else {
@@ -192,13 +192,13 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							path := "/static/stylsheet/VIDEO/" + post.PostUuid + ext
 							// Check if the file already exists and remove it
 							if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-								fmt.Println("post userpost no extention video :", err)
+								fmt.Println("post userpost, no extention video :", err)
 								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							} else {
 								err = os.Remove("./VIEWS" + path)
 								if err != nil {
-									fmt.Println("post userpost can't remove the path :", err)
+									fmt.Println("post userpost, can't remove the path :", err)
 									http.Redirect(w, r, "/500", http.StatusSeeOther)
 									return
 								}
@@ -207,7 +207,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							// Create and open the file for writing
 							f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 							if err != nil {
-								fmt.Println("post userpost ", err)
+								fmt.Println("post userpost :", err)
 								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							}

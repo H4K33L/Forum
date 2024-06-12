@@ -44,7 +44,7 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println(" changeprofile changepwd  Error retrieving cookie UUID:", err)
+		fmt.Println("changeprofile changepwd Error retrieving cookie UUID :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -60,11 +60,11 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT username, email, pwd FROM user WHERE uuid=?", uid.Value).Scan(&userChangePwd.username, &userChangePwd.email, &userChangePwd.pwd)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				fmt.Println("changeprofile changepwd  sql create:", err1)
+				fmt.Println("changeprofile changePwd  sql create :", err1)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("changeprofile changepwd error scan : ", err1)
+			fmt.Println("changeprofile changePwd error scan :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -131,7 +131,7 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println("changeprofile changeusername Error retrieving cookie UUID:", err)
+		fmt.Println("changeprofile changeusername Error retrieving cookie UUID :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -147,11 +147,11 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT username, email, pwd FROM user WHERE uuid=?", uid.Value).Scan(&userChangeUsername.username, &userChangeUsername.email, &userChangeUsername.pwd)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				fmt.Println("profile changeusername sql create:", err1)
+				fmt.Println("changeprofile changeusername sql create :", err1)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("changeprofile changeusername error scan : ", err1)
+			fmt.Println("changeprofile changeusername error scan :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -209,7 +209,7 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println("changeprofile changepp Error retrieving cookie UUID:", err)
+		fmt.Println("changeprofile changepp Error retrieving cookie UUID :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -227,7 +227,7 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 			if err == http.ErrMissingFile {
 				ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
 			} else {
-				fmt.Println("changeprofile changepp ppProfile image:", err)
+				fmt.Println("changeprofile changepp ppProfile image :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
@@ -249,7 +249,7 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 					} else {
 						err = os.Remove("./VIEWS" + path)
 						if err != nil {
-							fmt.Println("changeprofile changepp can't remove path", err)
+							fmt.Println("changeprofile changepp can't remove path :", err)
 							http.Redirect(w, r, "/500", http.StatusSeeOther)
 							return
 						}
@@ -257,14 +257,14 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 
 					f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 					if err != nil {
-						fmt.Println("changeprofile changepp can't open file", err)
+						fmt.Println("changeprofile changepp can't open file :", err)
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					}
 					defer f.Close()
 					_, err = io.Copy(f, file)
 					if err != nil {
-						fmt.Println("changeprofile changepp can't copy file", err)
+						fmt.Println("changeprofile changepp can't copy file :", err)
 						http.Redirect(w, r, "/500", http.StatusSeeOther)
 						return
 					}
