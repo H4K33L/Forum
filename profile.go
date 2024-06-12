@@ -45,12 +45,12 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query the profile table to retrieve the profile data based on the UUID
-	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles)
+	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
 	if err1 != nil {
 		if err1 == sql.ErrNoRows {
 			log.Fatal("profile profile sql :", err1)
 		}
-		log.Fatal(err1)
+		log.Fatal("profile profile error scan :", err1)
 	}
 
 	// Parse the profile page template and execute it with the retrieved profile data
@@ -91,7 +91,7 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 		if err1 == sql.ErrNoRows {
 			log.Fatal("profile createProfile sql:", err1)
 		}
-		log.Fatal(err1)
+		log.Fatal("profile createprofile error scan :", err1)
 	}
 
 	// Check if the username exists in the database
