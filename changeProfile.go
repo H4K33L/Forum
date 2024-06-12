@@ -41,9 +41,9 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("profile changepwd cookie not found")
+			log.Fatal("changeprofile changepwd cookie not found")
 		}
-		log.Fatal(" profile changepwd  Error retrieving cookie UUID:", err)
+		log.Fatal(" changeprofile changepwd  Error retrieving cookie UUID:", err)
 	}
 
 	// Handle the POST method for changing the password
@@ -57,9 +57,9 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT username, email, pwd FROM user WHERE uuid=?", uid.Value).Scan(&userChangePwd.username, &userChangePwd.email, &userChangePwd.pwd)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("profile changepwd  sql create:", err1)
+				log.Fatal("changeprofile changepwd  sql create:", err1)
 			}
-			log.Fatal(err1)
+			log.Fatal("changeprofile changepwd error scan : ", err1)
 		}
 
 		// Check the conditions for changing the password
@@ -75,11 +75,11 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 			// Hash the new password and update it in the database
 			hashed, err := HashPassword(pwd)
 			if err != nil {
-				log.Fatal("profile changepwd  err hash :", err)
+				log.Fatal("changeprofile changepwd  err hash :", err)
 			}
 			_, err = db.Exec("UPDATE user SET pwd =? WHERE UUID =? ", hashed, uid.Value)
 			if err != nil {
-				log.Fatal("profile changepwd  err rows :", err)
+				log.Fatal("changeprofile changepwd  err rows :", err)
 			}
 		}
 	}
@@ -117,9 +117,9 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("profile changeusername cookie not found")
+			log.Fatal("changeprofile changeusername cookie not found")
 		}
-		log.Fatal("profile changeusername Error retrieving cookie UUID:", err)
+		log.Fatal("changeprofile changeusername Error retrieving cookie UUID:", err)
 	}
 
 	// Handle the POST method for changing the username
@@ -135,7 +135,7 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 			if err1 == sql.ErrNoRows {
 				log.Fatal("profile changeusername sql create:", err1)
 			}
-			log.Fatal(err1)
+			log.Fatal("changeprofile changeusername error scan : ", err1)
 		}
 
 		// Check the conditions for changing the username
@@ -146,11 +146,11 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// Update the username in the database
 			if err != nil {
-				log.Fatal("profile changeusername err hash :", err)
+				log.Fatal("changeprofile changeusername err hash :", err)
 			}
 			_, err = db.Exec("UPDATE user SET username =? WHERE UUID =? ", username, uid.Value)
 			if err != nil {
-				log.Fatal("profile changeusername err rows :", err)
+				log.Fatal("changeprofile changeusername err rows :", err)
 			}
 		}
 	}
@@ -183,9 +183,9 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("profile changepp cookie not found")
+			log.Fatal("changeprofile changepp cookie not found")
 		}
-		log.Fatal("profile changepp Error retrieving cookie UUID:", err)
+		log.Fatal("changeprofile changepp Error retrieving cookie UUID:", err)
 	}
 
 	// Parse the HTML template file for the profile picture change page
@@ -201,34 +201,34 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 			if err == http.ErrMissingFile {
 				ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
 			} else {
-				log.Fatal("profile changepp ppProfile image:", err)
+				log.Fatal("changeprofile changepp ppProfile image:", err)
 			}
 		} else {
 			extension := strings.LastIndex(handler.Filename, ".")
 			if extension == -1 {
-				fmt.Println("profile changepp : there is no extension to the file")
+				fmt.Println("changeprofile changepp : there is no extension to the file")
 			} else {
 				ext := handler.Filename[extension:]
 				e := strings.ToLower(ext)
 				if e == ".png" || e == ".jpeg" || e == ".jpg" || e == ".gif" || e == ".svg" || e == ".avif" || e == ".apng" || e == ".webp" {
 					path := "/static/stylsheet/IMAGES/PP/" + uid.Value + ext
 					if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-						log.Fatal("profile changepp no extension :", err)
+						log.Fatal("changeprofile changepp no extension :", err)
 					} else {
 						err = os.Remove("./VIEWS" + path)
 						if err != nil {
-							log.Fatal("profile changepp can't remove path", err)
+							log.Fatal("changeprofile changepp can't remove path", err)
 						}
 					}
 
 					f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 					if err != nil {
-						log.Fatal("profile changepp can't open file", err)
+						log.Fatal("changeprofile changepp can't open file", err)
 					}
 					defer f.Close()
 					_, err = io.Copy(f, file)
 					if err != nil {
-						log.Fatal("profile changepp can't copy file", err)
+						log.Fatal("changeprofile changepp can't copy file", err)
 					}
 					ppProfile.Pp = path
 					ppProfile.Ext = "file"
@@ -243,7 +243,7 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 	// Update the profile picture in the database
 	_, err = db.Exec("UPDATE profile SET profilepicture =? WHERE UUID =? ", ppProfile.Pp, uid.Value)
 	if err != nil {
-		log.Fatal("profile changepp err rows :", err)
+		log.Fatal("changeprofile changepp err rows :", err)
 	}
 
 	// Execute the HTML template with the profile picture information

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"html/template"
-	"log"
 	"net/http"
 
 	"time"
@@ -146,14 +145,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			uid = cookieUuid
 		} else {
-			log.Fatal("authentification connexion Error retrieving cookie 'uuid' :", err)
+			fmt.Println("login_out login Error retrieving cookie 'UUID' :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 	}
 
 	// Check if the user is already logged in and has a profile.
 	iscreate, err := IsUserCreate(uid.Value, db)
 	if err != nil {
-		log.Fatal("authentification connexion error user created but there is a problem")
+		fmt.Println("login_out login error user created but there is a problem")
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// If the user is already logged in and has a profile, redirect to the account page.
@@ -171,23 +174,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT uuid FROM user WHERE username=? OR email=?", userconnect.username, userconnect.email).Scan(&userconnect.uid)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("authentification connexion sql :", err1)
+				fmt.Println("login_out login sql :", err1)
 			}
-			log.Fatal(err1)
+			fmt.Println(err1)
 		}
 
 		// Verify the login credentials.
 		booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
 		if err != nil {
-			log.Fatal("conn email ", err)
+			fmt.Println("login_out login : ", err)
 		}
 		booleanName, err2 := VerifieNameOrEmail(userconnect.username, db)
 		if err2 != nil {
-			log.Fatal("conn name ", err2)
+			fmt.Println("login_out login :", err2)
 		}
 		booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
 		if err1 != nil {
-			log.Fatal("conn pwd ", err1)
+			fmt.Println("login_out login : ", err1)
 		}
 
 		// If the credentials are valid, set the UUID cookie and redirect to the account page.
@@ -203,7 +206,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			http.Redirect(w, r, "/account", http.StatusSeeOther)
 		} else {
-			fmt.Println("authentification connexion  this account does not exist")
+			fmt.Println("login_out login this account does not exist")
 		}
 	}
 	// Execute the login page template.
@@ -246,7 +249,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		// Generate a UUID for the new user.
 		u, err := uuid.NewV4()
 		if err != nil {
-			log.Fatalf("authentification failed to generate UUID: %v", err)
+			fmt.Println("login_out login failed to generate UUID: %v", err)
 		}
 
 		// Check if the email and username are already in use.
@@ -270,7 +273,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 			userToAdd.username = newUserName
 			userToAdd.pwd, err = HashPassword(newPwd)
 			if err != nil {
-				log.Fatal("error hashing password during registration")
+				fmt.Println("login_out login error hashing password during registration")
 			}
 			userToAdd.uid = u.String()
 
@@ -288,7 +291,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/account", http.StatusSeeOther)
 				return
 			} else {
-				fmt.Println("error in adduser")
+				fmt.Println("login_out login error in adduser")
 			}
 		} else {
 			fmt.Println("you can't take your username as your password")
@@ -353,12 +356,12 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			uid = cookieUuid
 		} else {
-			log.Fatal("Error retrieving cookie 'UUID':", err)
+			fmt.Println("login_out login Error retrieving cookie 'UUID':", err)
 		}
 	}
 	_, err = db.Exec("DELETE FROM user WHERE uuid=?", uid.Value)
 	if err != nil {
-		fmt.Println("Error deleting user:", err)
+		fmt.Println("login_out login Error deleting user:", err)
 	}
 	Logout(w, r) // Déconnexion de l'utilisateur après suppression
 }
