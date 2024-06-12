@@ -134,7 +134,7 @@ Output:
 bool : true if the password meets the criteria, false otherwise.
 */
 func isCorrectPassword(password string) bool {
-	var hasUpper, hasLower, hasDigit, hasSpecial bool
+	hasUpper, hasLower, hasDigit, hasSpecial := false, false, false, false
 	for _, char := range password {
 		switch {
 		case unicode.IsUpper(char):
@@ -147,7 +147,10 @@ func isCorrectPassword(password string) bool {
 			hasSpecial = true
 		}
 	}
-	return hasUpper && hasLower && hasDigit && hasSpecial // Vérifie si toutes les conditions sont remplies
+	if !hasDigit || !hasLower || !hasSpecial || !hasUpper {
+		return false
+	}
+	return true // Vérifie si toutes les conditions sont remplies
 }
 
 /*

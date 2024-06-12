@@ -39,10 +39,10 @@ Output:
 none
 */
 func HomePage(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	/*if r.URL.Path != "/account" {
 		http.Redirect(w, r, "/404", http.StatusSeeOther)
 		return
-	}
+	}*/
 	// Parse the HTML template named "accueil.html".
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
 
@@ -66,10 +66,10 @@ Output:
 none
 */
 func Account(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/account" {
+	/*if r.URL.Path != "/account" {
 		http.Redirect(w, r, "/404", http.StatusSeeOther)
 		return
-	}
+	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	// Initialize database tables if they don't exist.
@@ -126,10 +126,10 @@ r : *http.Request, used to read the HTTP request.
 Output: none
 */
 func Login(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/login" {
+	/*if r.URL.Path != "/account" {
 		http.Redirect(w, r, "/404", http.StatusSeeOther)
 		return
-	}
+	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
@@ -233,10 +233,10 @@ r : *http.Request, used to read the HTTP request.
 Output: none
 */
 func Signup(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/signup" {
+	/*if r.URL.Path != "/account" {
 		http.Redirect(w, r, "/404", http.StatusSeeOther)
 		return
-	}
+	}*/
 	// Open the database connection.
 	db := OpenDb("./DATA/User_data.db")
 	defer db.Close()
