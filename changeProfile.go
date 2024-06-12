@@ -221,69 +221,72 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 	var ppProfile profile
 
 	// Handle the file upload for changing the profile picture
-	if r.FormValue("typedoc") == "file" {
-		file, handler, err := r.FormFile("documentFile")
-		if err != nil {
-			if err == http.ErrMissingFile {
-				ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
+	if r.Method == "POST" {
+		if r.FormValue("typedoc") == "file" {
+			file, handler, err := r.FormFile("documentFile")
+			if err != nil {
+				if err == http.ErrMissingFile {
+					ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
+				} else {
+					fmt.Println("changeprofile changepp ppProfile image:", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
+				}
 			} else {
-				fmt.Println("changeprofile changepp ppProfile image:", err)
-				http.Redirect(w, r, "/500", http.StatusSeeOther)
-				return
-			}
-		} else {
-			extension := strings.LastIndex(handler.Filename, ".")
-			if extension == -1 {
-				fmt.Println("changeprofile changepp : there is no extension to the file")
-				http.Redirect(w, r, "/500", http.StatusSeeOther)
-				return
-			} else {
-				ext := handler.Filename[extension:]
-				e := strings.ToLower(ext)
-				if e == ".png" || e == ".jpeg" || e == ".jpg" || e == ".gif" || e == ".svg" || e == ".avif" || e == ".apng" || e == ".webp" {
-					path := "/static/stylsheet/IMAGES/PP/" + uid.Value + ext
-					if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-						fmt.Println("changeprofile changepp no extension :", err)
-						http.Redirect(w, r, "/500", http.StatusSeeOther)
-						return
-					} else {
-						err = os.Remove("./VIEWS" + path)
+				extension := strings.LastIndex(handler.Filename, ".")
+				if extension == -1 {
+					fmt.Println("changeprofile changepp : there is no extension to the file")
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
+				} else {
+					ext := handler.Filename[extension:]
+					e := strings.ToLower(ext)
+					if e == ".png" || e == ".jpeg" || e == ".jpg" || e == ".gif" || e == ".svg" || e == ".avif" || e == ".apng" || e == ".webp" {
+						path := "/static/stylsheet/IMAGES/PP/" + uid.Value + ext
+						if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
+							fmt.Println("changeprofile changepp no extension :", err)
+							http.Redirect(w, r, "/500", http.StatusSeeOther)
+							return
+						} else {
+							err = os.Remove("./VIEWS" + path)
+							if err != nil {
+								fmt.Println("changeprofile changepp can't remove path", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
+								return
+							}
+						}
+
+						f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 						if err != nil {
-							fmt.Println("changeprofile changepp can't remove path", err)
+							fmt.Println("changeprofile changepp can't open file", err)
 							http.Redirect(w, r, "/500", http.StatusSeeOther)
 							return
 						}
+						defer f.Close()
+						_, err = io.Copy(f, file)
+						if err != nil {
+							fmt.Println("changeprofile changepp can't copy file", err)
+							http.Redirect(w, r, "/500", http.StatusSeeOther)
+							return
+						}
+						ppProfile.Pp = path
+						ppProfile.Ext = "file"
 					}
-
-					f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
-					if err != nil {
-						fmt.Println("changeprofile changepp can't open file", err)
-						http.Redirect(w, r, "/500", http.StatusSeeOther)
-						return
-					}
-					defer f.Close()
-					_, err = io.Copy(f, file)
-					if err != nil {
-						fmt.Println("changeprofile changepp can't copy file", err)
-						http.Redirect(w, r, "/500", http.StatusSeeOther)
-						return
-					}
-					ppProfile.Pp = path
-					ppProfile.Ext = "file"
 				}
 			}
+		} else {
+			ppProfile.Pp = r.FormValue("document")
+			ppProfile.Ext = "url"
 		}
-	} else {
-		ppProfile.Pp = r.FormValue("document")
-		ppProfile.Ext = "url"
-	}
 
-	// Update the profile picture in the database
-	_, err = db.Exec("UPDATE profile SET profilepicture =? WHERE UUID =? ", ppProfile.Pp, uid.Value)
-	if err != nil {
-		fmt.Println("changeprofile changepp err rows :", err)
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
-		return
+		// Update the profile picture in the database
+		_, err = db.Exec("UPDATE profile SET profilepicture =? WHERE UUID =? ", ppProfile.Pp, uid.Value)
+		if err != nil {
+			fmt.Println("changeprofile changepp err rows :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
+		}
+
 	}
 
 	// Execute the HTML template with the profile picture information
