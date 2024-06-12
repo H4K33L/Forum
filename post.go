@@ -5,10 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -50,7 +48,7 @@ output : nothing
 */
 func UserPost(w http.ResponseWriter, r *http.Request) {
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close() // Ensure the database connection is closed when the function exits
 	var post Post    // Define a variable to hold the post data
 	// Check if the request method is POST
@@ -59,18 +57,26 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal(" post UserPost, cookie not found userpost :", err)
+				fmt.Println(" post UserPost, cookie not found userpost :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("post UserPost, Error retrieving cookie uuid :", err)
+			fmt.Println("post UserPost, Error retrieving cookie uuid :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		var username string
 		// Query the user table to retrieve the username based on the UUID
 		err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("post UserPost, sql user post :", err1)
+				fmt.Println("post UserPost, sql user post :", err1)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal(err1)
+			fmt.Println("post userpost error scan:", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		// Fill the post struct with data from the request
 		post.Uuid = uid.Value
@@ -78,7 +84,9 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		post.Message = r.FormValue("message")
 		u, err := uuid.NewV4()
 		if err != nil {
-			log.Fatalf("post UserPost, failed to generate UUID: %v", err)
+			fmt.Println("post UserPost, failed to generate UUID: %v", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		// Generate a new UUID for the post
 		post.PostUuid = u.String()
@@ -94,13 +102,17 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					if err == http.ErrMissingFile {
 						post.Document = ""
 					} else {
-						log.Fatal("post UserPost, post image:", err)
+						fmt.Println("post UserPost, post image:", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					}
 				} else {
 					// Extract the file extension and validate it
 					extension := strings.LastIndex(handler.Filename, ".")
 					if extension == -1 {
-						log.Fatal("post UserPost image : there is no extension to the file")
+						fmt.Println("post UserPost image : there is no extension to the file")
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					} else {
 						ext := handler.Filename[extension:]
 						e := strings.ToLower(ext)
@@ -110,24 +122,32 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							path := "/static/stylsheet/IMAGES/POST/" + post.PostUuid + ext
 							// Check if the file already exists and remove it
 							if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-								log.Fatal("post userpost no extension os.error :", err)
+								fmt.Println("post userpost no extension os.error :", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
+								return
 							} else {
 								err = os.Remove("./VIEWS" + path)
 								if err != nil {
-									log.Fatal("post userpost can't remove the path :", err)
+									fmt.Println("post userpost can't remove the path :", err)
+									http.Redirect(w, r, "/500", http.StatusSeeOther)
+									return
 								}
 							}
 
 							// Create and open the file for writing
 							f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 							if err != nil {
-								log.Fatal("post userpost can't open the file :", err)
+								fmt.Println("post userpost can't open the file :", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
+								return
 							}
 							defer f.Close()
 							// Copy the uploaded file data to the destination file
 							_, err = io.Copy(f, file)
 							if err != nil {
-								log.Fatal("post userpost can't copy the file :", err)
+								fmt.Println("post userpost can't copy the file :", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
+								return
 							}
 							// Set the post's document path and extension
 							post.Document = path
@@ -152,13 +172,17 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 					if err == http.ErrMissingFile {
 						post.Document = ""
 					} else {
-						log.Fatal("post userpost video :", err)
+						fmt.Println("post userpost video :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					}
 				} else {
 					// Extract the file extension and validate it
 					extension := strings.LastIndex(handler.Filename, ".")
 					if extension == -1 {
 						fmt.Println("post user post video : there is no extension to the file")
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					} else {
 						ext := handler.Filename[extension:]
 						e := strings.ToLower(ext)
@@ -168,18 +192,23 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 							path := "/static/stylsheet/VIDEO/" + post.PostUuid + ext
 							// Check if the file already exists and remove it
 							if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-								log.Fatal("post userpost no extention video :", err)
+								fmt.Println("post userpost no extention video :", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
+								return
 							} else {
 								err = os.Remove("./VIEWS" + path)
 								if err != nil {
-									log.Fatal("post userpost can't remove the path :", err)
+									fmt.Println("post userpost can't remove the path :", err)
+									http.Redirect(w, r, "/500", http.StatusSeeOther)
+									return
 								}
 							}
 
 							// Create and open the file for writing
 							f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 							if err != nil {
-								log.Fatal("post userpost ", err)
+								fmt.Println("post userpost ", err)
+								http.Redirect(w, r, "/500", http.StatusSeeOther)
 								return
 							}
 							defer f.Close()
@@ -214,10 +243,10 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 		// Check if a channel is specified before adding the post to the database
 		if r.FormValue("chanel") != "" {
 			// Open a connection to the user database
-			db := OpenDb("./DATA/User_data.db")
+			db := OpenDb("./DATA/User_data.db", w, r)
 			defer db.Close()
 			// Add the post to the database
-			AddPost(db, post)
+			AddPost(db, post, w, r)
 		}
 	}
 }
@@ -229,30 +258,17 @@ input : db *sql.DB, post Post
 
 output : none
 */
-func AddPost(db *sql.DB, post Post) {
+func AddPost(db *sql.DB, post Post, w http.ResponseWriter, r *http.Request) {
 	// Prepare the SQL statement for inserting a new post into the database
 	statement, err := db.Prepare("INSERT INTO post(uuid, postuuid, username, message, document, ext, typedoc, date, chanel, target, like, dislike) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
-		log.Fatal("post AddPost, sql add post :", err)
+		fmt.Println("post AddPost, sql add post :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 	// Convert channel and target slices to string format
 	chanel := convertToString(post.Chanel)
 	target := convertToString(post.Target)
 	// Execute the SQL statement with post data
 	statement.Exec(post.Uuid, post.PostUuid, post.Username, post.Message, post.Document, post.Ext, post.TypeDoc, post.Date, chanel, target, post.Like, post.Dislike)
-}
-
-/*
-The function take an array of sting and convert it to sting whith "|\\/|-_-|\\/|+{}" joiner,
-this function is only suposed to be used to convert array of string in string to be stocked in db.
-
-input : array []string
-
-output : string
-*/
-func convertToString(array []string) string {
-	// Sort the elements of the array alphabetically
-	sort.Strings(array)
-	// Join the sorted array elements into a single string using a custom separator
-	return strings.Join(array, "|\\/|-_-|\\/|+{}")
 }

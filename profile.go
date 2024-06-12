@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -32,25 +31,33 @@ Output: none
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("profile profile cookie not found :", err)
+			fmt.Println("profile profile cookie not found :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("profile profile Error retrieving cookie UUID:", err)
+		fmt.Println("profile profile Error retrieving cookie UUID:", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Query the profile table to retrieve the profile data based on the UUID
 	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
 	if err1 != nil {
 		if err1 == sql.ErrNoRows {
-			log.Fatal("profile profile sql :", err1)
+			fmt.Println("profile profile sql :", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("profile profile error scan :", err1)
+		fmt.Println("profile profile error scan :", err1)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Parse the profile page template and execute it with the retrieved profile data
@@ -72,16 +79,20 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 // Output : none/
 func createProfile(w http.ResponseWriter, r *http.Request) {
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("profile createProfile cookie not found ")
+			fmt.Println("profile createProfile cookie not found ")
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("profile createProfile Error retrieving cookie UUID:", err)
+		fmt.Println("profile createProfile Error retrieving cookie UUID:", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Retrieve the username associated with the UUID
@@ -89,9 +100,13 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 	err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
 	if err1 != nil {
 		if err1 == sql.ErrNoRows {
-			log.Fatal("profile createProfile sql:", err1)
+			fmt.Println("profile createProfile sql:", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("profile createprofile error scan :", err1)
+		fmt.Println("profile createprofile error scan :", err1)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Check if the username exists in the database
@@ -107,8 +122,9 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 		// Prepare and execute the SQL statement to insert the new profile
 		statement, err := db.Prepare("INSERT INTO profile(uuid, username, profilepicture) VALUES(?, ?, ?)")
 		if err != nil {
-			fmt.Println(err)
-			log.Fatal("profile createProfile error Prepare new profile")
+			fmt.Println("profile createProfile error Prepare new profile:", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		statement.Exec(userProfile.Uid, userProfile.Username, userProfile.Pp)
 	}

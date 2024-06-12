@@ -2,6 +2,8 @@ package client
 
 import (
 	"database/sql"
+	"sort"
+	"strings"
 	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
@@ -201,4 +203,19 @@ bool : true if the password matches the hashed version, false otherwise.
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil // Retourne true si les mots de passe correspondent
+}
+
+/*
+The function take an array of sting and convert it to sting whith "|\\/|-_-|\\/|+{}" joiner,
+this function is only suposed to be used to convert array of string in string to be stocked in db.
+
+input : array []string
+
+output : string
+*/
+func convertToString(array []string) string {
+	// Sort the elements of the array alphabetically
+	sort.Strings(array)
+	// Join the sorted array elements into a single string using a custom separator
+	return strings.Join(array, "|\\/|-_-|\\/|+{}")
 }

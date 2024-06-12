@@ -20,9 +20,7 @@ The function also serves static files for resources like CSS, JavaScript, etc.
 Output: none
 */
 func main() {
-	db := client.OpenDb("./DATA/User_data.db")
-	client.InitDb(db)
-	defer db.Close()
+
 	fmt.Println("server successfully up, go to http://localhost:8080")
 
 	// Serve static files for resources like CSS, JavaScript, etc.
@@ -30,7 +28,12 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	// Set URL handlers for different routes.
-	http.HandleFunc("/", client.HomePage)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		db := client.OpenDb("./DATA/User_data.db", w, r)
+		client.InitDb(db, w, r)
+		defer db.Close()
+		client.HomePage(w, r)
+	})
 	http.HandleFunc("/logout", client.Logout)
 	http.HandleFunc("/signup", client.Signup)
 	http.HandleFunc("/login", client.Login)
@@ -51,6 +54,7 @@ func main() {
 	http.HandleFunc("/delete", client.Delete)
 	http.HandleFunc("/pp", client.ChangePP)
 	http.HandleFunc("/404", client.Error404)
+	http.HandleFunc("/500", client.Error500)
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -34,16 +33,20 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 	var userChangePwd user
 
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("changeprofile changepwd cookie not found")
+			fmt.Println("changeprofile changepwd cookie not found")
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal(" changeprofile changepwd  Error retrieving cookie UUID:", err)
+		fmt.Println(" changeprofile changepwd  Error retrieving cookie UUID:", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Handle the POST method for changing the password
@@ -57,9 +60,13 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT username, email, pwd FROM user WHERE uuid=?", uid.Value).Scan(&userChangePwd.username, &userChangePwd.email, &userChangePwd.pwd)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("changeprofile changepwd  sql create:", err1)
+				fmt.Println("changeprofile changepwd  sql create:", err1)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("changeprofile changepwd error scan : ", err1)
+			fmt.Println("changeprofile changepwd error scan : ", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
 		// Check the conditions for changing the password
@@ -75,15 +82,18 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 			// Hash the new password and update it in the database
 			hashed, err := HashPassword(pwd)
 			if err != nil {
-				log.Fatal("changeprofile changepwd  err hash :", err)
+				fmt.Println("changeprofile changepwd  err hash :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 			_, err = db.Exec("UPDATE user SET pwd =? WHERE UUID =? ", hashed, uid.Value)
 			if err != nil {
-				log.Fatal("changeprofile changepwd  err rows :", err)
+				fmt.Println("changeprofile changepwd  err rows :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 		}
 	}
-
 	// Execute the HTML template with the user information
 	openpage.Execute(w, userChangePwd)
 }
@@ -110,16 +120,20 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 	var userChangeUsername user
 
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("changeprofile changeusername cookie not found")
+			fmt.Println("changeprofile changeusername cookie not found")
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("changeprofile changeusername Error retrieving cookie UUID:", err)
+		fmt.Println("changeprofile changeusername Error retrieving cookie UUID:", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Handle the POST method for changing the username
@@ -133,9 +147,13 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 		err1 := db.QueryRow("SELECT username, email, pwd FROM user WHERE uuid=?", uid.Value).Scan(&userChangeUsername.username, &userChangeUsername.email, &userChangeUsername.pwd)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
-				log.Fatal("profile changeusername sql create:", err1)
+				fmt.Println("profile changeusername sql create:", err1)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("changeprofile changeusername error scan : ", err1)
+			fmt.Println("changeprofile changeusername error scan : ", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
 		// Check the conditions for changing the username
@@ -146,11 +164,15 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// Update the username in the database
 			if err != nil {
-				log.Fatal("changeprofile changeusername err hash :", err)
+				fmt.Println("changeprofile changeusername err hash :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 			_, err = db.Exec("UPDATE user SET username =? WHERE UUID =? ", username, uid.Value)
 			if err != nil {
-				log.Fatal("changeprofile changeusername err rows :", err)
+				fmt.Println("changeprofile changeusername err rows :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 		}
 	}
@@ -176,16 +198,20 @@ Output: none
 */
 func ChangePP(w http.ResponseWriter, r *http.Request) {
 	// Open a connection to the user database
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			log.Fatal("changeprofile changepp cookie not found")
+			fmt.Println("changeprofile changepp cookie not found")
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
-		log.Fatal("changeprofile changepp Error retrieving cookie UUID:", err)
+		fmt.Println("changeprofile changepp Error retrieving cookie UUID:", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Parse the HTML template file for the profile picture change page
@@ -201,34 +227,46 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 			if err == http.ErrMissingFile {
 				ppProfile.Pp = "../static/stylsheet/IMAGES/PP/Avatar.jpg"
 			} else {
-				log.Fatal("changeprofile changepp ppProfile image:", err)
+				fmt.Println("changeprofile changepp ppProfile image:", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 		} else {
 			extension := strings.LastIndex(handler.Filename, ".")
 			if extension == -1 {
 				fmt.Println("changeprofile changepp : there is no extension to the file")
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			} else {
 				ext := handler.Filename[extension:]
 				e := strings.ToLower(ext)
 				if e == ".png" || e == ".jpeg" || e == ".jpg" || e == ".gif" || e == ".svg" || e == ".avif" || e == ".apng" || e == ".webp" {
 					path := "/static/stylsheet/IMAGES/PP/" + uid.Value + ext
 					if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-						log.Fatal("changeprofile changepp no extension :", err)
+						fmt.Println("changeprofile changepp no extension :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					} else {
 						err = os.Remove("./VIEWS" + path)
 						if err != nil {
-							log.Fatal("changeprofile changepp can't remove path", err)
+							fmt.Println("changeprofile changepp can't remove path", err)
+							http.Redirect(w, r, "/500", http.StatusSeeOther)
+							return
 						}
 					}
 
 					f, err := os.OpenFile("./VIEWS"+path, os.O_WRONLY|os.O_CREATE, 0666)
 					if err != nil {
-						log.Fatal("changeprofile changepp can't open file", err)
+						fmt.Println("changeprofile changepp can't open file", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					}
 					defer f.Close()
 					_, err = io.Copy(f, file)
 					if err != nil {
-						log.Fatal("changeprofile changepp can't copy file", err)
+						fmt.Println("changeprofile changepp can't copy file", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
 					}
 					ppProfile.Pp = path
 					ppProfile.Ext = "file"
@@ -243,7 +281,9 @@ func ChangePP(w http.ResponseWriter, r *http.Request) {
 	// Update the profile picture in the database
 	_, err = db.Exec("UPDATE profile SET profilepicture =? WHERE UUID =? ", ppProfile.Pp, uid.Value)
 	if err != nil {
-		log.Fatal("changeprofile changepp err rows :", err)
+		fmt.Println("changeprofile changepp err rows :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 
 	// Execute the HTML template with the profile picture information

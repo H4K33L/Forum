@@ -2,7 +2,7 @@ package client
 
 import (
 	"database/sql"
-	"log"
+	"fmt"
 	"net/http"
 	"sort"
 	"strings"
@@ -25,9 +25,13 @@ func GetPost(w http.ResponseWriter, r *http.Request) []Post {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("getpostt GetPost, cookie not found userpost :", err)
+				fmt.Println("getpostt GetPost, cookie not found userpost :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return nil
 			}
-			log.Fatal("getpost GetPost, Error retrieving cookie uuid :", err)
+			fmt.Println("getpost GetPost, Error retrieving cookie uuid :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return nil
 		}
 
 		// Retrieve the username and channels from the request form
@@ -35,7 +39,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) []Post {
 		chanels := r.FormValue("chanels")
 
 		// Return the posts obtained by the given username, channels, and UUID
-		return GetPostByBoth(OpenDb("./DATA/User_data.db"), usename, chanels, uid)
+		return GetPostByBoth(OpenDb("./DATA/User_data.db", w, r), usename, chanels, uid, w, r)
 	}
 	return nil
 }
@@ -48,12 +52,14 @@ input : db *sql.DB, username string, uid *http.Cookie
 
 output : array of Post struct
 */
-func getPostByUser(db *sql.DB, username string, uid *http.Cookie) []Post {
+func getPostByUser(db *sql.DB, username string, uid *http.Cookie, w http.ResponseWriter, r *http.Request) []Post {
 	output := []Post{}
 	// Query posts by the given username
 	UserPost, err := db.Query("SELECT * FROM post WHERE username=?", username)
 	if err != nil {
-		log.Fatal("getpost getPostByUser, error in hash :", err)
+		fmt.Println("getpost getPostByUser, error in hash :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return nil
 	}
 	defer UserPost.Close()
 	for UserPost.Next() {
@@ -61,7 +67,9 @@ func getPostByUser(db *sql.DB, username string, uid *http.Cookie) []Post {
 		var chanel string
 		var target string
 		if err := UserPost.Scan(&post.ID, &post.Uuid, &post.Username, &post.Message, &post.Document, &post.Date, &chanel, &target, &post.Like, &post.Dislike); err != nil {
-			log.Fatal("getpostt getPostByUser, error in reading :", err)
+			fmt.Println("getpostt getPostByUser, error in reading :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return nil
 		}
 		post.Chanel = convertToArray(chanel)
 		post.Target = convertToArray(target)
@@ -69,12 +77,14 @@ func getPostByUser(db *sql.DB, username string, uid *http.Cookie) []Post {
 		// Check if the current user made the post
 		post.IsUserMadePost = (uid.Value == post.Uuid)
 		// Check if the current user liked or disliked the post
-		post.IsUserLikePost, post.IsUserDislikePost = getLikedPost(db, post.ID, uid.Value)
+		post.IsUserLikePost, post.IsUserDislikePost = getLikedPost(db, post.ID, uid.Value, w, r)
 
 		output = append(output, post)
 	}
 	if err = UserPost.Err(); err != nil {
-		log.Fatal("getpost getPostByUser, error in reading :", err)
+		fmt.Println("getpost getPostByUser, error in reading :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return nil
 	}
 	return output
 }
@@ -99,7 +109,7 @@ input : db *sql.DB, chanel string, uid *http.Cookie
 
 output : array of Post struct
 */
-func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
+func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie, w http.ResponseWriter, r *http.Request) []Post {
 	// Split the channel string into an array of channel names.
 	array := strings.Split(chanel, "R/")
 	// Sort the array of channel names.
@@ -112,7 +122,9 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
 	UserPost, err := db.Query("SELECT * FROM post WHERE chanel LIKE ?", "%"+chanel+"%")
 	if err != nil {
 		// Log a fatal error if there is an issue with the database query.
-		log.Fatal("getpost getPostByChanel, error in Get post request :", err)
+		fmt.Println("getpost getPostByChanel, error in Get post request :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return nil
 	}
 	// Defer closing the UserPost rows after the function returns.
 	defer UserPost.Close()
@@ -126,7 +138,9 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
 		// Scan the columns of the current row into the fields of the Post struct.
 		if err := UserPost.Scan(&post.ID, &post.Uuid, &post.PostUuid, &post.Username, &post.Message, &post.Document, &post.Ext, &post.TypeDoc, &post.Date, &chanel, &target, &post.Like, &post.Dislike); err != nil {
 			// Log a fatal error if there is an issue scanning the row.
-			log.Fatal("getpost getPostByChanel, error in reading", err)
+			fmt.Println("getpost getPostByChanel, error in reading", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return nil
 		}
 		// Convert the channel and target strings into arrays and assign them to the corresponding fields of the Post struct.
 		post.Chanel = convertToArray(chanel)
@@ -139,7 +153,9 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie) []Post {
 	// Check for any errors that occurred during iteration over the UserPost result set.
 	if err = UserPost.Err(); err != nil {
 		// Log a fatal error if there was an error.
-		log.Fatal("getpost getPostByChanel, error in reading", err)
+		fmt.Println("getpost getPostByChanel, error in reading", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return nil
 	}
 	// Return the slice containing the retrieved posts.
 	return output
@@ -153,15 +169,15 @@ input : db *sql.DB, username string, chanel string, uid *http.Cookie
 
 output : array of Post struct
 */
-func GetPostByBoth(db *sql.DB, username string, chanel string, uid *http.Cookie) []Post {
+func GetPostByBoth(db *sql.DB, username string, chanel string, uid *http.Cookie, w http.ResponseWriter, r *http.Request) []Post {
 	// Retrieve posts by username.
-	postList1 := getPostByUser(db, username, uid)
+	postList1 := getPostByUser(db, username, uid, w, r)
 	// If no channel filter is provided, return posts filtered by username only.
 	if chanel == "" {
 		return postList1
 	}
 	// Retrieve posts by channel.
-	postList2 := getPostByChanel(db, chanel, uid)
+	postList2 := getPostByChanel(db, chanel, uid, w, r)
 	// If no username filter is provided, return posts filtered by channel only.
 	if username == "" {
 		return postList2
@@ -190,13 +206,15 @@ input : db *sql.DB, ID string
 
 output : a Post
 */
-func getPostByID(db *sql.DB, ID string) Post {
+func getPostByID(db *sql.DB, ID string, w http.ResponseWriter, r *http.Request) Post {
 	output := Post{}
 
 	// Query the post table to retrieve the post details based on its ID
 	UserPost, err := db.Query("SELECT * FROM post WHERE ID=?", ID)
 	if err != nil {
-		log.Fatal("likefunc getPostByID, error in hash :", err)
+		fmt.Println("likefunc getPostByID, error in hash :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return output
 	}
 	defer UserPost.Close()
 
@@ -207,7 +225,9 @@ func getPostByID(db *sql.DB, ID string) Post {
 		var answers string
 		// Scan the query results into the output struct
 		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
-			log.Fatal("likefunc getPostByID, error in reading :", err)
+			fmt.Println("likefunc getPostByID, error in reading :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return output
 		}
 		// Convert the channel and target strings to arrays
 		output.Chanel = convertToArray(chanel)
@@ -216,7 +236,9 @@ func getPostByID(db *sql.DB, ID string) Post {
 
 	// Check for any errors during iteration
 	if err = UserPost.Err(); err != nil {
-		log.Fatal("likefunc getPostByID, error in reading :", err)
+		fmt.Println("likefunc getPostByID, error in reading :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return output
 	}
 
 	return output
@@ -231,11 +253,13 @@ input : db *sql.DB, ID int, uuid string
 
 output : boolean , boolean
 */
-func getLikedPost(db *sql.DB, ID int, uuid string) (bool, bool) {
+func getLikedPost(db *sql.DB, ID int, uuid string, w http.ResponseWriter, r *http.Request) (bool, bool) {
 	// Query the like table to check if the post with the given ID and UUID has been liked or disliked
 	liked, err := db.Query("SELECT * FROM like WHERE id=? AND uuid=?", ID, uuid)
 	if err != nil {
-		log.Fatal("likefunc getPostByID, error in hash like :", err)
+		fmt.Println("likefunc getPostByID, error in hash like :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return false, false
 	}
 	defer liked.Close()
 
@@ -248,13 +272,17 @@ func getLikedPost(db *sql.DB, ID int, uuid string) (bool, bool) {
 		var Uuid string
 		// Scan the query results into variables
 		if err := liked.Scan(&Id, &Uuid, &Liked, &Disliked); err != nil {
-			log.Fatal("likefunc getPostByID, error in reading :", err)
+			fmt.Println("likefunc getPostByID, error in reading :", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return false, false
 		}
 	}
 
 	// Check for any errors during iteration
 	if err = liked.Err(); err != nil {
-		log.Fatal("likefunc getPostByID, error in reading :", err)
+		fmt.Println("likefunc getPostByID, error in reading :", err)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return false, false
 	}
 
 	return Liked, Disliked

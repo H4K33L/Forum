@@ -1,8 +1,8 @@
 package client
 
 import (
+	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"time"
 )
@@ -21,71 +21,85 @@ r *http.Request
 output : none
 */
 func GetCookie(w http.ResponseWriter, r *http.Request) {
-	// Ouvre une connexion à la base de données et assure sa fermeture à la fin de la fonction.
-	db := OpenDb("./DATA/User_data.db")
+	// Open a connection to the database and ensure it is closed at the end of the function.
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	var posts []Post
 
-	// Si des publications sont disponibles pour la requête actuelle
+	// If posts are available for the current request
 	if GetPost(w, r) != nil {
-		// Crée et configure un cookie pour enregistrer le dernier nom d'utilisateur de la requête.
+		// Create and configure a cookie to store the last username from the request.
 		requestPostName := &http.Cookie{
 			Name:    "LastUsername",
 			Value:   r.FormValue("username"),
 			Path:    "/",
 			Expires: time.Now().Add(24 * time.Hour),
 		}
-		// Envoie le cookie au client.
+		// Send the cookie to the client.
 		http.SetCookie(w, requestPostName)
 
-		// Crée et configure un cookie pour enregistrer le dernier canal de la requête.
+		// Create and configure a cookie to store the last channel from the request.
 		requestPostChanel := &http.Cookie{
 			Name:    "LastChanel",
 			Value:   r.FormValue("chanels"),
 			Path:    "/",
 			Expires: time.Now().Add(24 * time.Hour),
 		}
-		// Envoie le cookie au client.
+		// Send the cookie to the client.
 		http.SetCookie(w, requestPostChanel)
 
-		// Obtient les publications pour la requête actuelle.
+		// Get the posts for the current request.
 		posts = GetPost(w, r)
 	} else {
-		// Récupère le cookie "LastUsername".
+		// Retrieve the "LastUsername" cookie.
 		lastUsername, err := r.Cookie("LastUsername")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found LastUsername") // Le cookie "LastUsername" est introuvable.
+				fmt.Println("cookie not found LastUsername") // The "LastUsername" cookie is not found.
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("Error retrieving cookie LastUsername:", err) // Erreur lors de la récupération du cookie "LastUsername".
+			fmt.Println("Error retrieving cookie LastUsername:", err) // Error retrieving the "LastUsername" cookie.
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
-		// Récupère le cookie "LastChanel".
+		// Retrieve the "LastChanel" cookie.
 		lastChanel, err := r.Cookie("LastChanel")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found LastChanel") // Le cookie "LastChanel" est introuvable.
+				fmt.Println("cookie not found LastChanel") // The "LastChanel" cookie is not found.
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("Error retrieving cookie LastChanel:", err) // Erreur lors de la récupération du cookie "LastChanel".
+			fmt.Println("Error retrieving cookie LastChanel:", err) // Error retrieving the "LastChanel" cookie.
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
-		// Récupère le cookie "UUID".
+		// Retrieve the "UUID" cookie.
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				log.Fatal("cookie not found userpost") // Le cookie "UUID" est introuvable.
+				fmt.Println("cookie not found userpost") // The "UUID" cookie is not found.
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
-			log.Fatal("Error retrieving cookie uuid:", err) // Erreur lors de la récupération du cookie "UUID".
+			fmt.Println("Error retrieving cookie uuid:", err) // Error retrieving the "UUID" cookie.
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
-		// Obtient les publications en fonction du dernier nom d'utilisateur et du dernier canal.
-		posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid)
+		// Get the posts based on the last username and last channel.
+		posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid,w,r)
 	}
 
-	// Charge et exécute le modèle de la page d'accueil avec les publications obtenues.
+	// Load and execute the homepage template with the obtained posts.
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
 	if err := openpage.Execute(w, posts); err != nil {
-		log.Fatal("erreur lors de l'envoi:", err) // Erreur lors de l'exécution du modèle.
+		fmt.Println("error executing template:", err) // Error executing the template.
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
 	}
 }

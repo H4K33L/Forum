@@ -1,7 +1,7 @@
 package client
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,41 +25,51 @@ func Like(w http.ResponseWriter, r *http.Request) {
 		// Proceed if the post ID is not empty
 		if ID != "" {
 			// Open a connection to the user database
-			db := OpenDb("./DATA/User_data.db")
+			db := OpenDb("./DATA/User_data.db", w, r)
 			defer db.Close()
 
 			// Get the post details based on its ID
-			likes := getPostByID(db, ID)
+			likes := getPostByID(db, ID, w, r)
 
 			// Retrieve the UUID cookie from the request
 			Uuid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {
-					log.Fatal("likefunc Like, cookie not found Uuid", err)
+					fmt.Println("likefunc Like, cookie not found Uuid", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
-				log.Fatal("likefunc Like, Error retrieving cookie Uuid :", err)
+				fmt.Println("likefunc Like, Error retrieving cookie Uuid :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 
 			// Check if the user has already liked or disliked the post
-			liked, disliked := getLikedPost(db, likes.ID, Uuid.Value)
+			liked, disliked := getLikedPost(db, likes.ID, Uuid.Value, w, r)
 
 			// If the user has already liked the post, undo the like
 			if liked {
 				nbLikes := likes.Like - 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Like, error during Atoi conversion :", err)
+					fmt.Println("likefunc Like, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's like count
 				_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
 				if err != nil {
-					log.Fatal("likefunc Like, err rows like :", err)
+					fmt.Println("likefunc Like, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Remove the like entry from the like table
 				_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
 				if err != nil {
-					log.Fatal("likefunc Like, err deleting post :", err)
+					fmt.Println("likefunc Like, err deleting post :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// If the user has disliked the post, change the dislike to like
 			} else if disliked {
@@ -67,36 +77,48 @@ func Like(w http.ResponseWriter, r *http.Request) {
 				nbDislikes := likes.Dislike - 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Like, error during Atoi conversion :", err)
+					fmt.Println("likefunc Like, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's like and dislike counts
 				_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
 				if err != nil {
-					log.Fatal("likefunc Like, err rows like :", err)
+					fmt.Println("likefunc Like, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Update the like entry in the like table
 				_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", true, false, ID, Uuid.Value)
 				if err != nil {
-					log.Fatal("likefunc Like, err rows like :", err)
+					fmt.Println("likefunc Like, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// If the user has not liked or disliked the post, like it
 			} else {
 				nbLikes := likes.Like + 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Like, error during Atoi conversion :", err)
+					fmt.Println("likefunc Like, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's like count
 				_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
 				if err != nil {
-					log.Fatal("likefunc Like, err rows like :", err)
+					fmt.Println("likefunc Like, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Insert a new like entry in the like table
 				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
 				if err != nil {
-					log.Fatal("likefunc Like, sql add post", err)
+					fmt.Println("likefunc Like, sql add post", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				statement.Exec(i, Uuid.Value, true, false)
 			}
@@ -121,23 +143,27 @@ func Dislike(w http.ResponseWriter, r *http.Request) {
 		// Proceed if the post ID is not empty
 		if ID != "" {
 			// Open a connection to the user database
-			db := OpenDb("./DATA/User_data.db")
+			db := OpenDb("./DATA/User_data.db", w, r)
 			defer db.Close()
 
 			// Get the post details based on its ID
-			dislikes := getPostByID(db, ID)
+			dislikes := getPostByID(db, ID, w, r)
 
 			// Retrieve the UUID cookie from the request
 			Uuid, err := r.Cookie("UUID")
 			if err != nil {
 				if err == http.ErrNoCookie {
-					log.Fatal("likefunc Dislike, cookie not found Uuid", err)
+					fmt.Println("likefunc Dislike, cookie not found Uuid", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
-				log.Fatal("likefunc Dislike, Error retrieving cookie Uuid :", err)
+				fmt.Println("likefunc Dislike, Error retrieving cookie Uuid :", err)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 
 			// Check if the user has already liked or disliked the post
-			liked, disliked := getLikedPost(db, dislikes.ID, Uuid.Value)
+			liked, disliked := getLikedPost(db, dislikes.ID, Uuid.Value, w, r)
 
 			// If the user has already liked the post, change the like to dislike
 			if liked {
@@ -145,54 +171,72 @@ func Dislike(w http.ResponseWriter, r *http.Request) {
 				nbDislikes := dislikes.Dislike + 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Dislike, error during Atoi conversion :", err)
+					fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's like and dislike counts
 				_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
 				if err != nil {
-					log.Fatal("likefunc Dislike, err rows like :", err)
+					fmt.Println("likefunc Dislike, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Update the like entry in the like table
 				_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", false, true, ID, Uuid.Value)
 				if err != nil {
-					log.Fatal("likefunc Dislike, err rows like :", err)
+					fmt.Println("likefunc Dislike, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// If the user has already disliked the post, undo the dislike
 			} else if disliked {
 				nbDislikes := dislikes.Dislike - 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Dislike, error during Atoi conversion :", err)
+					fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's dislike count
 				_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
 				if err != nil {
-					log.Fatal("likefunc Dislike, err rows like :", err)
+					fmt.Println("likefunc Dislike, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Remove the like entry from the like table
 				_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
 				if err != nil {
-					log.Fatal("likefunc Dislike, err deleting post :", err)
+					fmt.Println("likefunc Dislike, err deleting post :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// If the user has not liked or disliked the post, dislike it
 			} else {
 				nbDislikes := dislikes.Dislike + 1
 				i, err := strconv.Atoi(ID)
 				if err != nil {
-					log.Fatal("likefunc Dislike, error during Atoi conversion :", err)
+					fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				// Update the post's dislike count
 				_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
 				if err != nil {
-					log.Fatal("likefunc Dislike, err rows like :", err)
+					fmt.Println("likefunc Dislike, err rows like :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
 				// Insert a new like entry in the like table
 				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
 				if err != nil {
-					log.Fatal("likefunc Dislike, sql add like", err)
+					fmt.Println("likefunc Dislike, sql add like", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 				statement.Exec(i, Uuid.Value, false, true)
 			}

@@ -66,11 +66,11 @@ none
 */
 func Account(w http.ResponseWriter, r *http.Request) {
 	// Open the database connection.
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	// Initialize database tables if they don't exist.
-	InitDbProfile(db)
-	InitDbpost(db)
-	InitDbLike(db)
+	InitDbProfile(db, w, r)
+	InitDbpost(db, w, r)
+	InitDbLike(db, w, r)
 	// Defer closing the database connection until the function returns.
 	defer db.Close()
 	// Create a user profile if it doesn't exist.
@@ -122,7 +122,7 @@ Output: none
 */
 func Login(w http.ResponseWriter, r *http.Request) {
 	// Open the database connection.
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Parse the HTML template for the login page.
@@ -175,6 +175,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
 				fmt.Println("login_out login sql :", err1)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 			fmt.Println(err1)
 		}
@@ -183,14 +185,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
 		if err != nil {
 			fmt.Println("login_out login : ", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		booleanName, err2 := VerifieNameOrEmail(userconnect.username, db)
 		if err2 != nil {
 			fmt.Println("login_out login :", err2)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 		booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
 		if err1 != nil {
 			fmt.Println("login_out login : ", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
 		// If the credentials are valid, set the UUID cookie and redirect to the account page.
@@ -207,6 +215,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/account", http.StatusSeeOther)
 		} else {
 			fmt.Println("login_out login this account does not exist")
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 	}
 	// Execute the login page template.
@@ -229,7 +239,7 @@ Output: none
 */
 func Signup(w http.ResponseWriter, r *http.Request) {
 	// Open the database connection.
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
 	// Parse the HTML template for the registration page.
@@ -249,7 +259,9 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		// Generate a UUID for the new user.
 		u, err := uuid.NewV4()
 		if err != nil {
-			fmt.Println("login_out login failed to generate UUID: %v", err)
+			fmt.Println("login_out signup failed to generate UUID: %v", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 
 		// Check if the email and username are already in use.
@@ -273,7 +285,9 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 			userToAdd.username = newUserName
 			userToAdd.pwd, err = HashPassword(newPwd)
 			if err != nil {
-				fmt.Println("login_out login error hashing password during registration")
+				fmt.Println("login_out signup error hashing password during registration")
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 			userToAdd.uid = u.String()
 
@@ -291,7 +305,9 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/account", http.StatusSeeOther)
 				return
 			} else {
-				fmt.Println("login_out login error in adduser")
+				fmt.Println("login_out signup error in adduser")
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
 			}
 		} else {
 			fmt.Println("you can't take your username as your password")
@@ -323,7 +339,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(24 * time.Hour),
 	}
 	http.SetCookie(w, cookieUuid)
-	http.Redirect(w, r, "/", http.StatusSeeOther) // Redirection vers la page d'accueil
+	http.Redirect(w, r, "/", http.StatusSeeOther) // Redirection to home page
 }
 
 /*
@@ -342,7 +358,7 @@ r : *http.Request, used to read the HTTP request.
 Output: none
 */
 func Delete(w http.ResponseWriter, r *http.Request) {
-	db := OpenDb("./DATA/User_data.db")
+	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 	uid, err := r.Cookie("UUID")
 	if err != nil {
@@ -356,12 +372,14 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			uid = cookieUuid
 		} else {
-			fmt.Println("login_out login Error retrieving cookie 'UUID':", err)
+			fmt.Println("login_out delete Error retrieving cookie 'UUID':", err)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
 		}
 	}
 	_, err = db.Exec("DELETE FROM user WHERE uuid=?", uid.Value)
 	if err != nil {
-		fmt.Println("login_out login Error deleting user:", err)
+		fmt.Println("login_out delete Error deleting user:", err)
 	}
-	Logout(w, r) // Déconnexion de l'utilisateur après suppression
+	Logout(w, r) // logout of the user
 }
