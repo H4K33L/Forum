@@ -163,11 +163,6 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("you can't replace the actual username by the actual username")
 		} else {
 			// Update the username in the database
-			if err != nil {
-				fmt.Println("changeprofile changeusername err hash :", err)
-				http.Redirect(w, r, "/500", http.StatusSeeOther)
-				return
-			}
 			_, err = db.Exec("UPDATE user SET username =? WHERE UUID =? ", username, uid.Value)
 			if err != nil {
 				fmt.Println("changeprofile changeusername err rows :", err)
