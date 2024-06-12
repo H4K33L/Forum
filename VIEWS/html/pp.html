@@ -4,23 +4,26 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitsune</title>
-    <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
+    <link href="/static/stylsheet/subPage.css" rel="stylesheet" type="text/css">
 </head>
 <body>
     <script type="module" src="../static/js/pp.js"></script>
-    <article class="typedoc">
-        <div>
-            <input type="radio" id="url" name="typedoc" value="url" />
-            <label for="url">url</label>
-        </div>
-        <div>
-            <input type="radio" id="file" name="typedoc" value="file" checked />
-            <label for="file">file</label>
-        </div>
-    </article> 
-    <input type="file" name="documentFile" id="filepost">
-    <input type="url" name="document" autofocus placeholder="Placez ici l'URL de l'image" id="urlpost">
-    <section class="button">
-        <a href="/profile"><button type="button"><span class="text">profile page</span></button></a>
+    <section class="box">
+        <article class="typedoc">
+            <article>
+                <input type="radio" id="url" name="typedoc" value="url" />
+                <label for="url">url</label>
+            </article>
+            <article>
+                <input type="radio" id="file" name="typedoc" value="file" checked />
+                <label for="file">file</label>
+            </article>
+        </article> 
+        <input type="file" name="documentFile" id="filepost">
+        <input type="url" name="document" autofocus placeholder="Placez ici l'URL de l'image" id="urlpost">
+        <section class="button">
+            <a href="/profile"><button type="button"><span class="text">profile page</span></button></a>
+        </section>
     </section>
 </body>
+</html>
