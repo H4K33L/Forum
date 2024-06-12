@@ -1,8 +1,7 @@
-package authentification
+package client
 
 import (
-	"database/sql"
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,7 +9,7 @@ import (
 )
 
 /*
-The function http request and http respose, get the information in the 
+The function http request and http respose, get the information in the
 form like and add add a like to a post, or remove it if the post is already
 like by the user.
 
@@ -19,76 +18,122 @@ input : w http.ResponseWriter, r *http.Request
 output : nothing
 */
 func Like(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		ID := r.FormValue("like")
-		if ID != "" {
-			db := OpenDb("./DATA/User_data.db")
-			defer db.Close()
-			likes := getPostByID(db, ID)
+	uid, err := r.Cookie("UUID")
+	if err != nil || uid.Value == "" {
+		http.Redirect(w, r, "/401", http.StatusSeeOther)
+		return
+	} else {
+		// Check if the request method is POST
+		if r.Method == "POST" {
+			// Retrieve the post ID from the form data
+			ID := r.FormValue("like")
+			// Proceed if the post ID is not empty
+			if ID != "" {
+				// Open a connection to the user database
+				db := OpenDb("./DATA/User_data.db", w, r)
+				defer db.Close()
 
-			Uuid, err := r.Cookie("UUID")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					log.Fatal("Like, cookie not found Uuid", err)
-				}
-				log.Fatal("Like, Error retrieving cookie Uuid :", err)
-			}
+				// Get the post details based on its ID
+				likes := getPostByID(db, ID, w, r)
 
-			liked, disliked := getLikedPost(db, likes.ID, Uuid.Value)
-			if liked {
-				nbLikes := likes.Like - 1
-				i, err := strconv.Atoi(ID)
+				// Retrieve the UUID cookie from the request
+				Uuid, err := r.Cookie("UUID")
 				if err != nil {
-					log.Fatal("Like, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
-				if err != nil {
-					log.Fatal("Like, err rows like :", err)
-				}
-
-				_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
-				if err != nil {
-					log.Fatal("Like, err deleting post :", err)
-				}
-			} else if disliked {
-				nbLikes := likes.Like + 1
-				nbDislikes := likes.Dislike - 1
-				i, err := strconv.Atoi(ID)
-				if err != nil {
-					log.Fatal("Like, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
-				if err != nil {
-					log.Fatal("Like, err rows like :", err)
+					if err == http.ErrNoCookie {
+						fmt.Println("likefunc Like, cookie not found Uuid", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					fmt.Println("likefunc Like, Error retrieving cookie Uuid :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
 
-				_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", true, false, ID, Uuid.Value)
-				if err != nil {
-					log.Fatal("Like, err rows like :", err)
-				}
-			} else {
-				nbLikes := likes.Like + 1
-				i, err := strconv.Atoi(ID)
-				if err != nil {
-					log.Fatal("Like, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
-				if err != nil {
-					log.Fatal("Like, err rows like :", err)
-				}
+				// Check if the user has already liked or disliked the post
+				liked, disliked := getLikedPost(db, likes.ID, Uuid.Value, w, r)
 
-				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
-				if err != nil {
-					log.Fatal("Like, sql add post", err)
+				// If the user has already liked the post, undo the like
+				if liked {
+					nbLikes := likes.Like - 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Like, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's like count
+					_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
+					if err != nil {
+						fmt.Println("likefunc Like, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Remove the like entry from the like table
+					_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
+					if err != nil {
+						fmt.Println("likefunc Like, err deleting post :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// If the user has disliked the post, change the dislike to like
+				} else if disliked {
+					nbLikes := likes.Like + 1
+					nbDislikes := likes.Dislike - 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Like, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's like and dislike counts
+					_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
+					if err != nil {
+						fmt.Println("likefunc Like, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Update the like entry in the like table
+					_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", true, false, ID, Uuid.Value)
+					if err != nil {
+						fmt.Println("likefunc Like, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// If the user has not liked or disliked the post, like it
+				} else {
+					nbLikes := likes.Like + 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Like, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's like count
+					_, err = db.Exec("UPDATE post SET like =? WHERE ID =? ", nbLikes, i)
+					if err != nil {
+						fmt.Println("likefunc Like, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Insert a new like entry in the like table
+					statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
+					if err != nil {
+						fmt.Println("likefunc Like, sql add post", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					statement.Exec(i, Uuid.Value, true, false)
 				}
-				statement.Exec(i, Uuid.Value, true, false)
 			}
 		}
 	}
 }
 
 /*
-The function http request and http respose, get the information in the 
+The function http request and http respose, get the information in the
 form dislike and add add a dislike to a post, or remove it if the post is already
 dislike by the user.
 
@@ -97,131 +142,116 @@ input : w http.ResponseWriter, r *http.Request
 output : nothing
 */
 func Dislike(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		ID := r.FormValue("dislike")
-		if ID != "" {
-			db := OpenDb("./DATA/User_data.db")
-			defer db.Close()
-			dislikes := getPostByID(db, ID)
+	// Check if the request method is POST
+	uid, err := r.Cookie("UUID")
+	if err != nil || uid.Value == "" {
+		http.Redirect(w, r, "/401", http.StatusSeeOther)
+		return
+	} else {
+		if r.Method == "POST" {
+			// Retrieve the post ID from the form data
+			ID := r.FormValue("dislike")
+			// Proceed if the post ID is not empty
+			if ID != "" {
+				// Open a connection to the user database
+				db := OpenDb("./DATA/User_data.db", w, r)
+				defer db.Close()
 
-			Uuid, err := r.Cookie("UUID")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					log.Fatal("Dislike, cookie not found Uuid", err)
+				// Get the post details based on its ID
+				dislikes := getPostByID(db, ID, w, r)
+
+				// Retrieve the UUID cookie from the request
+				Uuid, err := r.Cookie("UUID")
+				if err != nil {
+					if err == http.ErrNoCookie {
+						fmt.Println("likefunc Dislike, cookie not found Uuid", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					fmt.Println("likefunc Dislike, Error retrieving cookie Uuid :", err)
+					http.Redirect(w, r, "/500", http.StatusSeeOther)
+					return
 				}
-				log.Fatal("Dislike, Error retrieving cookie Uuid :", err)
+
+				// Check if the user has already liked or disliked the post
+				liked, disliked := getLikedPost(db, dislikes.ID, Uuid.Value, w, r)
+
+				// If the user has already liked the post, change the like to dislike
+				if liked {
+					nbLikes := dislikes.Like - 1
+					nbDislikes := dislikes.Dislike + 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's like and dislike counts
+					_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
+					if err != nil {
+						fmt.Println("likefunc Dislike, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Update the like entry in the like table
+					_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", false, true, ID, Uuid.Value)
+					if err != nil {
+						fmt.Println("likefunc Dislike, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// If the user has already disliked the post, undo the dislike
+				} else if disliked {
+					nbDislikes := dislikes.Dislike - 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's dislike count
+					_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
+					if err != nil {
+						fmt.Println("likefunc Dislike, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Remove the like entry from the like table
+					_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
+					if err != nil {
+						fmt.Println("likefunc Dislike, err deleting post :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// If the user has not liked or disliked the post, dislike it
+				} else {
+					nbDislikes := dislikes.Dislike + 1
+					i, err := strconv.Atoi(ID)
+					if err != nil {
+						fmt.Println("likefunc Dislike, error during Atoi conversion :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					// Update the post's dislike count
+					_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
+					if err != nil {
+						fmt.Println("likefunc Dislike, err rows like :", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+
+					// Insert a new like entry in the like table
+					statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
+					if err != nil {
+						fmt.Println("likefunc Dislike, sql add like", err)
+						http.Redirect(w, r, "/500", http.StatusSeeOther)
+						return
+					}
+					statement.Exec(i, Uuid.Value, false, true)
+				}
 			}
-
-			liked, disliked := getLikedPost(db, dislikes.ID, Uuid.Value)
-			if liked {
-				nbLikes := dislikes.Like - 1
-				nbDislikes := dislikes.Dislike + 1
-				i, err := strconv.Atoi(ID)
-				if err != nil {
-					log.Fatal("Dislike, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET like =?, dislike =? WHERE ID =? ", nbLikes, nbDislikes, i)
-				if err != nil {
-					log.Fatal("Dislike, err rows like :", err)
-				}
-
-				_, err = db.Exec("UPDATE like SET liked=?, disliked=? WHERE ID=? AND uuid=?", false, true, ID, Uuid.Value)
-				if err != nil {
-					log.Fatal("Dislike, err rows like :", err)
-				}
-			} else if disliked {
-				nbDislikes := dislikes.Dislike - 1
-				i, err := strconv.Atoi(ID)
-				if err != nil {
-					log.Fatal("Dislike, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
-				if err != nil {
-					log.Fatal("Dislike, err rows like :", err)
-				}
-
-				_, err = db.Exec("DELETE FROM like WHERE ID =? AND uuid=? ", i, Uuid.Value)
-				if err != nil {
-					log.Fatal("Dislike, err deleting post :", err)
-				}
-			} else {
-				nbDislikes := dislikes.Dislike + 1
-				i, err := strconv.Atoi(ID)
-				if err != nil {
-					log.Fatal("Dislike, error during Atoi conversion :", err)
-				}
-				_, err = db.Exec("UPDATE post SET dislike =? WHERE ID =? ", nbDislikes, i)
-				if err != nil {
-					log.Fatal("Dislike, err rows like :", err)
-				}
-
-				statement, err := db.Prepare("INSERT INTO like(id, uuid, liked, disliked) VALUES(?, ?, ?, ?)")
-				if err != nil {
-					log.Fatal("Dislike, sql add like", err)
-				}
-				statement.Exec(i, Uuid.Value, false, true)
-			}
 		}
 	}
-}
-
-/*
-The function take a DB, a string reprsenting the ID and return the post coresponding whith the ID.
-
-input : db *sql.DB, ID string
-
-output : a Post
-*/
-func getPostByID(db *sql.DB, ID string) Post {
-	output := Post{}
-	UserPost, err := db.Query("SELECT * FROM post WHERE ID=?", ID)
-	if err != nil {
-		log.Fatal("getPostByID, error in hash :", err)
-	}
-	defer UserPost.Close()
-	for UserPost.Next() {
-		var chanel string
-		var target string
-		var answers string
-		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
-			log.Fatal("getPostByID, error in reading :", err)
-		}
-		output.Chanel = convertToArray(chanel)
-		output.Target = convertToArray(target)
-		output.Answers = convertToArray(answers)
-	}
-	if err = UserPost.Err(); err != nil {
-		log.Fatal("getPostByID, error in reading :", err)
-	}
-	return output
-}
-
-/*
-The function take a DB, a int representing the ID and a string representing th uuid, the function
-get the in like db table coresponding whith ID and uuid and return the two boolean representing 
-if the user like or dislike the post.
-
-input : db *sql.DB, ID int, uuid string
-
-output : boolean , boolean
-*/
-func getLikedPost(db *sql.DB, ID int, uuid string) (bool, bool){
-	liked, err := db.Query("SELECT * FROM like WHERE id=? AND uuid=?", ID, uuid)
-	if err != nil {
-		log.Fatal("getPostByID, error in hash like :",err)
-	}
-	defer liked.Close()
-	var Id int
-	var Uuid string
-	var Liked bool
-	var Disliked bool
-	for liked.Next() {
-		if err := liked.Scan(&Id, &Uuid, &Liked, &Disliked); err != nil {
-			log.Fatal("getPostByID, error in reading :", err)
-		}
-	}
-	if err = liked.Err(); err != nil {
-		log.Fatal("getPostByID, error in reading :", err)
-	}
-	return Liked, Disliked
 }

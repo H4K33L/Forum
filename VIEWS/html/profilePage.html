@@ -4,28 +4,31 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitsune</title>
-    <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
+    <link href="/static/stylsheet/subPage.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <main>
-        <section class="button">
-            <a href="/pwd"><button type="button"><span class="text">changer de mot de passe</span></button></a>
-        </section>
-        <section class="button">
-            <a href="/username"><button type="button"><span class="text">changer de pseudo</span></button></a>
-        </section>
-        <section class="button">
-            <a href="/compte"><button type="button"><span class="text">home page</span></button></a>
-        </section>
-        <section class="button">
-            <a href="/deconnexion"><button type="button"><span class="text">se déconnecter</span></button></a>
-        </section>
-        <section class="button">
-            <a href="/suppression"><button type="button"><span class="text">supprimer le compte</span></button></a>
-        </section>
-        <section class="button">
-            <a href="/pp"><button type="button"><span class="text">changer la pp</span></button></a>
-        </section>
-    </main>
+    <section class="box">
+        <img src="{{.Pp}}" >
+        <h1>Gestion du compte</h1>
+        <article class="button">
+            <a href="/pwd"><button type="button" class="btn"><span class="text">changer de mot de passe</span></button></a>
+        </article>
+        <article class="button">
+            <a href="/username"><button type="button" class="btn"><span class="text">changer de pseudo</span></button></a>
+        </article>
+        <article class="button">
+            <a href="/pp"><button type="button" class="btn"><span class="text">changer la pp</span></button></a>
+        </article>
+        <article class="button">
+            <a href="/delete"><button type="button" class="btn"><span class="text">supprimer le compte</span></button></a>
+        </article>
+        <h1>Retour aux post & deconexion</h1>
+        <article class="button">
+            <a href="/account"><button type="button" class="btn"><span class="text">home page</span></button></a>
+        </article>
+        <article class="button">
+            <a href="/logout"><button type="button" class="btn"><span class="text">se déconnecter</span></button></a>
+        </article>
+    </section>
 </body>
 </html>

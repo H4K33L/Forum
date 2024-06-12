@@ -1,12 +1,9 @@
 package main
 
 import (
-	"authentification"
+	"client"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
-	"time"
 )
 
 /*
@@ -23,9 +20,7 @@ The function also serves static files for resources like CSS, JavaScript, etc.
 Output: none
 */
 func main() {
-	db := authentification.OpenDb("./DATA/User_data.db")
-	authentification.InitDb(db)
-	defer db.Close()
+
 	fmt.Println("server successfully up, go to http://localhost:8080")
 
 	// Serve static files for resources like CSS, JavaScript, etc.
@@ -33,89 +28,34 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	// Set URL handlers for different routes.
-	http.HandleFunc("/", authentification.Accueil)
-	http.HandleFunc("/deconnexion", authentification.Deconnexion)
-	http.HandleFunc("/inscription", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Inscription(w, r)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		db := client.OpenDb("./DATA/User_data.db", w, r)
+		client.InitDb(db, w, r)
+		defer db.Close()
+		client.HomePage(w, r)
 	})
-	http.HandleFunc("/connexion", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Connexion(w, r)
-	})
-	http.HandleFunc("/compte", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Compte(w, r)
-		authentification.UserPost(w, r)
-		authentification.Like(w, r)
-		authentification.Dislike(w, r)
-		authentification.PostSupr(w, r)
-		authentification.PostEdit(w, r)
+	http.HandleFunc("/logout", client.Logout)
+	http.HandleFunc("/signup", client.Signup)
+	http.HandleFunc("/login", client.Login)
 
-		var posts []authentification.Post
-		if authentification.GetPost(w, r) != nil {
-			requestPostName := &http.Cookie{
-				Name:    "LastUsername",
-				Value:   r.FormValue("username"),
-				Path:    "/",
-				Expires: time.Now().Add(24 * time.Hour),
-			}
-			http.SetCookie(w, requestPostName)
-
-			requestPostChanel := &http.Cookie{
-				Name:    "LastChanel",
-				Value:   r.FormValue("chanels"),
-				Path:    "/",
-				Expires: time.Now().Add(24 * time.Hour),
-			}
-			http.SetCookie(w, requestPostChanel)
-
-			posts = authentification.GetPost(w, r)
-		} else {
-			lastUsername, err := r.Cookie("LastUsername")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					log.Fatal("cookie not found LastUsername")
-				}
-				log.Fatal("Error retrieving cookie LastUsername :", err)
-			}
-
-			lastChanel, err := r.Cookie("LastChanel")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					log.Fatal("cookie not found LastChanel")
-				}
-				log.Fatal("Error retrieving cookie LastChanel :", err)
-			}
-
-			uid, err := r.Cookie("UUID")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					log.Fatal("cookie not found userpost")
-				}
-				log.Fatal("Error retrieving cookie uuid :", err)
-			}
-			posts = authentification.GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid)
-		}
-
-		openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
-		if err := openpage.Execute(w, posts); err != nil {
-			log.Fatal("erreur lors de l'envois ", err)
-		}
+	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
+		client.Account(w, r)
+		client.UserPost(w, r)
+		client.Like(w, r)
+		client.Dislike(w, r)
+		client.PostSupr(w, r)
+		client.PostEdit(w, r)
+		client.GetCookie(w, r)
 	})
 
-	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Profile(w, r)
-	})
-	http.HandleFunc("/pwd", func(w http.ResponseWriter, r *http.Request) {
-		authentification.ChangePwd(w, r)
-	})
-	http.HandleFunc("/username", func(w http.ResponseWriter, r *http.Request) {
-		authentification.ChangeUsername(w, r)
-	})
-	http.HandleFunc("/suppression", func(w http.ResponseWriter, r *http.Request) {
-		authentification.Delete(w, r)
-	})
-	http.HandleFunc("/pp", func(w http.ResponseWriter, r *http.Request) {
-		authentification.ChangePP(w, r)
-	})
+	http.HandleFunc("/profile", client.Profile)
+	http.HandleFunc("/pwd", client.ChangePwd)
+	http.HandleFunc("/username", client.ChangeUsername)
+	http.HandleFunc("/delete", client.Delete)
+	http.HandleFunc("/pp", client.ChangePP)
+	http.HandleFunc("/404", client.Error404)
+	http.HandleFunc("/500", client.Error500)
+	http.HandleFunc("/401", client.Error500)
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }

@@ -4,16 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitsune</title>
-    <!--<link href="/static/form.css" rel="stylesheet" type="text/css">-->
+    <link href="/static/stylsheet/subPage.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <main>
+    <section class="box">
+        <h1>Changer de mots de passe</h1>
         <form method="POST">
-            <input type="password" name="actualpwd" required autofocus placeholder="entrer votre mot de passe actuel">
-            <input type="password" minlength="8" name="newPwd" required autofocus placeholder="entrer le nouveau mot de passe">
-            <input type="password" minlength="8" name="newPwd2" required autofocus placeholder="réecriver le mot de passe">
-            <input type="submit" value="changer de mot de passe">
+            <input type="password" name="actualpwd" required autofocus placeholder="entrer votre mot de passe actuel" class="entry">
+            <input type="password" minlength="8" name="newPwd" required autofocus placeholder="entrer le nouveau mot de passe" class="entry">
+            <input type="password" minlength="8" name="newPwd2" required autofocus placeholder="réecriver le mot de passe" class="entry">
+            <input type="submit" value="changer de mot de passe" class="btn">
         </form>
-    </main>
+    </section>
 </body>
 </html>
