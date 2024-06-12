@@ -20,3 +20,11 @@ func Error500(w http.ResponseWriter, r *http.Request) {
 	// Execute the parsed template, passing any necessary data (users) to it.
 	openpage.Execute(w, users) // The 'users' variable is referenced but not defined.
 }
+
+func Error401(w http.ResponseWriter, r *http.Request) {
+	// Parse the HTML template named "accueil.html".
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/401.html"))
+
+	// Execute the parsed template, passing any necessary data (users) to it.
+	openpage.Execute(w, users) // The 'users' variable is referenced but not defined.
+}

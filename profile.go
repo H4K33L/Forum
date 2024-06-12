@@ -36,33 +36,27 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve the UUID cookie from the request
 	uid, err := r.Cookie("UUID")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			fmt.Println("profile profile cookie not found :", err)
+	if err != nil || uid.Value == "" {
+		http.Redirect(w, r, "/401", http.StatusSeeOther)
+		return
+	} else {
+		// Query the profile table to retrieve the profile data based on the UUID
+		err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
+		if err1 != nil {
+			if err1 == sql.ErrNoRows {
+				fmt.Println("profile profile sql :", err1)
+				http.Redirect(w, r, "/500", http.StatusSeeOther)
+				return
+			}
+			fmt.Println("profile profile error scan :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println("profile profile Error retrieving cookie UUID:", err)
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
-		return
+		// Parse the profile page template and execute it with the retrieved profile data
+		openpage := template.Must(template.ParseFiles("./VIEWS/html/profilePage.html"))
+		openpage.Execute(w, profiles)
 	}
 
-	// Query the profile table to retrieve the profile data based on the UUID
-	err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
-	if err1 != nil {
-		if err1 == sql.ErrNoRows {
-			fmt.Println("profile profile sql :", err1)
-			http.Redirect(w, r, "/500", http.StatusSeeOther)
-			return
-		}
-		fmt.Println("profile profile error scan :", err1)
-		http.Redirect(w, r, "/500", http.StatusSeeOther)
-		return
-	}
-
-	// Parse the profile page template and execute it with the retrieved profile data
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/profilePage.html"))
-	openpage.Execute(w, profiles)
 }
 
 // createProfile(w, r)

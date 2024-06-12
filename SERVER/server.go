@@ -55,6 +55,7 @@ func main() {
 	http.HandleFunc("/pp", client.ChangePP)
 	http.HandleFunc("/404", client.Error404)
 	http.HandleFunc("/500", client.Error500)
+	http.HandleFunc("/401", client.Error500)
 	// Start the HTTP server on port 8080.
 	http.ListenAndServe(":8080", nil)
 }
