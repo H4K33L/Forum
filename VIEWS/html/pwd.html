@@ -5,16 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitsune</title>
     <link href="/static/stylsheet/subPage.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
+    <script type="module" src="../static/js/pwd.js"></script>
     <section class="box">
         <h1>Changer de mots de passe</h1>
         <form method="POST">
-            <input type="password" name="actualpwd" required autofocus placeholder="entrer votre mot de passe actuel" class="entry">
-            <input type="password" minlength="8" name="newPwd" required autofocus placeholder="entrer le nouveau mot de passe" class="entry">
-            <input type="password" minlength="8" name="newPwd2" required autofocus placeholder="réecriver le mot de passe" class="entry">
+            <article class="password-container">
+                <input type="password" name="actualpwd" required autofocus placeholder="entrer votre mot de passe actuel" class="entry" id="pwd1">
+                <button type="button" id="togglePassword" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
+            </article>
+            <article class="password-container">
+                <input type="password" minlength="8" name="newPwd" required autofocus placeholder="entrer le nouveau mot de passe" class="entry" id="pwd2">
+                <button type="button" id="togglePassword2" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
+            </article>
+            <article class="password-container">
+                <input type="password" minlength="8" name="newPwd2" required autofocus placeholder="réecriver le mot de passe" class="entry" id="pwd3">
+                <button type="button" id="togglePassword3" class="toggle-button"><i class="fa-solid fa-eye"></i></button>
+            </article>
             <input type="submit" value="changer de mot de passe" class="btn">
         </form>
+        <section class="button">
+            <a href="/profile"><button type="button" class="btn"><span class="text">profile page</span></button></a>
+        </section>
     </section>
 </body>
 </html>

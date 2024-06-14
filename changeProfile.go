@@ -80,7 +80,7 @@ func ChangePwd(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("the password is wrongfully written, you need at least one uppercase letter, one lowercase letter, one number, and one special character")
 		} else {
 			// Hash the new password and update it in the database
-			hashed, err := HashPassword(pwd)
+			hashed, err := HashPassword(newPwd)
 			if err != nil {
 				fmt.Println("changeprofile changepwd  err hash :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
@@ -168,7 +168,7 @@ func ChangeUsername(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			_, err = db.Exec("UPDATE user SET username =? WHERE UUID =? ", username, uid.Value)
+			_, err = db.Exec("UPDATE user SET username =? WHERE UUID =? ", newUsername, uid.Value)
 			if err != nil {
 				fmt.Println("changeprofile changeusername err rows :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
