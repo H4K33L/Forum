@@ -259,7 +259,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		// Generate a UUID for the new user.
 		u, err := uuid.NewV4()
 		if err != nil {
-			fmt.Println("login_out signup failed to generate UUID: %v", err)
+			fmt.Println("login_out signup failed to generate UUID:", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}

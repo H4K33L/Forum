@@ -41,7 +41,7 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		// Query the profile table to retrieve the profile data based on the UUID
-		err1 := db.QueryRow("SELECT * FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
+		err1 := db.QueryRow("SELECT uuid,username,profilepicture FROM profile WHERE uuid=?", uid.Value).Scan(&profiles.Uid, &profiles.Username, &profiles.Pp)
 		if err1 != nil {
 			if err1 == sql.ErrNoRows {
 				fmt.Println("profile profile sql :", err1)
