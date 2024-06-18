@@ -89,7 +89,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 			post.Message = r.FormValue("message")
 			u, err := uuid.NewV4()
 			if err != nil {
-				fmt.Println("post UserPost, failed to generate UUID: %v", err)
+				fmt.Println("post UserPost, failed to generate UUID:", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
