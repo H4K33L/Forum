@@ -22,6 +22,13 @@ type user struct {
 
 var users user
 
+type allStruct struct {
+	Profile profile
+	Posts   []Post
+}
+
+var AllStruct allStruct
+
 /*
 Accueil(w, r)
 

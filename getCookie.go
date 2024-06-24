@@ -25,8 +25,6 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
 
-	var posts []Post
-
 	// If posts are available for the current request
 	if GetPost(w, r) != nil {
 		// Create and configure a cookie to store the last username from the request.
@@ -50,7 +48,7 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, requestPostChanel)
 
 		// Get the posts for the current request.
-		posts = GetPost(w, r)
+		AllStruct.Posts = GetPost(w, r)
 	} else {
 		// Retrieve the "LastUsername" cookie.
 		lastUsername, err := r.Cookie("LastUsername")
@@ -92,12 +90,12 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Get the posts based on the last username and last channel.
-		posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid,w,r)
+		AllStruct.Posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid, w, r)
 	}
 
 	// Load and execute the homepage template with the obtained posts.
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
-	if err := openpage.Execute(w, posts); err != nil {
+	if err := openpage.Execute(w, AllStruct); err != nil {
 		fmt.Println("GetCookie GetCookie error executing template :", err) // Error executing the template.
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
