@@ -138,7 +138,7 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie, w http.Respons
 		// Scan the columns of the current row into the fields of the Post struct.
 		if err := UserPost.Scan(&post.ID, &post.Uuid, &post.PostUuid, &post.Username, &post.Message, &post.Document, &post.Ext, &post.TypeDoc, &post.Date, &chanel, &target, &post.Like, &post.Dislike); err != nil {
 			// Log a fatal error if there is an issue scanning the row.
-			fmt.Println("getpost getPostByChanel, error in reading", err)
+			fmt.Println("getpost getPostByChanel, error in reading :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return nil
 		}
@@ -153,7 +153,7 @@ func getPostByChanel(db *sql.DB, chanel string, uid *http.Cookie, w http.Respons
 	// Check for any errors that occurred during iteration over the UserPost result set.
 	if err = UserPost.Err(); err != nil {
 		// Log a fatal error if there was an error.
-		fmt.Println("getpost getPostByChanel, error in reading", err)
+		fmt.Println("getpost getPostByChanel, error in reading :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return nil
 	}
@@ -212,7 +212,7 @@ func getPostByID(db *sql.DB, ID string, w http.ResponseWriter, r *http.Request) 
 	// Query the post table to retrieve the post details based on its ID
 	UserPost, err := db.Query("SELECT * FROM post WHERE ID=?", ID)
 	if err != nil {
-		fmt.Println("likefunc getPostByID, error in hash :", err)
+		fmt.Println("getPost getPostByID, error in hash :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return output
 	}
@@ -225,7 +225,7 @@ func getPostByID(db *sql.DB, ID string, w http.ResponseWriter, r *http.Request) 
 		var answers string
 		// Scan the query results into the output struct
 		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
-			fmt.Println("likefunc getPostByID, error in reading :", err)
+			fmt.Println("getPost getPostByID, error in reading :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return output
 		}
@@ -236,7 +236,7 @@ func getPostByID(db *sql.DB, ID string, w http.ResponseWriter, r *http.Request) 
 
 	// Check for any errors during iteration
 	if err = UserPost.Err(); err != nil {
-		fmt.Println("likefunc getPostByID, error in reading :", err)
+		fmt.Println("getPost getPostByID, error in reading :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return output
 	}
@@ -257,7 +257,7 @@ func getLikedPost(db *sql.DB, ID int, uuid string, w http.ResponseWriter, r *htt
 	// Query the like table to check if the post with the given ID and UUID has been liked or disliked
 	liked, err := db.Query("SELECT * FROM like WHERE id=? AND uuid=?", ID, uuid)
 	if err != nil {
-		fmt.Println("likefunc getPostByID, error in hash like :", err)
+		fmt.Println("getPost getPostByID, error in hash like :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return false, false
 	}
@@ -272,7 +272,7 @@ func getLikedPost(db *sql.DB, ID int, uuid string, w http.ResponseWriter, r *htt
 		var Uuid string
 		// Scan the query results into variables
 		if err := liked.Scan(&Id, &Uuid, &Liked, &Disliked); err != nil {
-			fmt.Println("likefunc getPostByID, error in reading :", err)
+			fmt.Println("getPost getPostByID, error in reading :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return false, false
 		}
@@ -280,7 +280,7 @@ func getLikedPost(db *sql.DB, ID int, uuid string, w http.ResponseWriter, r *htt
 
 	// Check for any errors during iteration
 	if err = liked.Err(); err != nil {
-		fmt.Println("likefunc getPostByID, error in reading :", err)
+		fmt.Println("getPost getPostByID, error in reading :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return false, false
 	}

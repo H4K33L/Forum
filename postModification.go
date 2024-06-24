@@ -49,7 +49,7 @@ func PostSupr(w http.ResponseWriter, r *http.Request) {
 			// Convert the ID to integer
 			i, err := strconv.Atoi(ID)
 			if err != nil {
-				fmt.Println("postmodification postsupr err atoi:", err)
+				fmt.Println("postmodification postsupr, err atoi :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
@@ -140,7 +140,7 @@ func PostEdit(w http.ResponseWriter, r *http.Request) {
 			// Convert the ID to integer
 			i, err := strconv.Atoi(ID)
 			if err != nil {
-				fmt.Println("postmodification postedit error atoi:", err)
+				fmt.Println("postmodification postedit, error atoi:", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}

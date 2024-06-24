@@ -97,7 +97,7 @@ func Adduser(db *sql.DB, user user) string {
 	statement, err := db.Prepare("INSERT INTO user(uuid, email, username, pwd) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		// If there's an error preparing the statement, return an error message.
-		fmt.Println("Adduser", err)
+		fmt.Println("login_out Adduser :", err)
 		return "authentification adduser error Prepare new user"
 	}
 	// Execute the prepared statement to insert the new user into the database.
@@ -154,7 +154,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Check if the user is already logged in and has a profile.
 	iscreate, err := IsUserCreate(uid.Value, db)
 	if err != nil {
-		fmt.Println("login_out login error user created but there is a problem")
+		fmt.Println("login_out login error user created but there is a problem :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -184,7 +184,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		// Verify the login credentials.
 		booleanUser, err := VerifieNameOrEmail(userconnect.email, db)
 		if err != nil {
-			fmt.Println("login_out login : ", err)
+			fmt.Println("login_out login :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -196,14 +196,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 		booleanPwd, err1 := VerifiePwd(userconnect.email, userconnect.pwd, db)
 		if err1 != nil {
-			fmt.Println("login_out login : ", err1)
+			fmt.Println("login_out login :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
 
 		// If the credentials are valid, set the UUID cookie and redirect to the account page.
 		if !booleanPwd {
-			fmt.Println("this password is wrong:", userconnect.pwd)
+			fmt.Println("login_out login, this password is wrong :", userconnect.pwd)
 		} else if booleanUser || booleanName {
 			cookieUuid := &http.Cookie{
 				Name:    "UUID",
@@ -214,7 +214,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			http.Redirect(w, r, "/account", http.StatusSeeOther)
 		} else {
-			fmt.Println("login_out login this account does not exist")
+			fmt.Println("login_out login, this account does not exist")
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -270,22 +270,22 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 		// Validate the password.
 		if newPwd != newPwd2 {
-			fmt.Println("the passwords are not equal")
+			fmt.Println("login_out signup, the passwords are not equal")
 		} else if len(newPwd) < 8 {
-			fmt.Println("this password is not long enough")
+			fmt.Println("login_out signup, this password is not long enough")
 		} else if !isCorrectPassword(newPwd) {
-			fmt.Println("this password is not secure enough")
+			fmt.Println("login_out signup, this password is not secure enough")
 		} else if booleanEmail {
-			fmt.Println("this user already exists")
+			fmt.Println("login_out signup, this user already exists")
 		} else if booleanName {
-			fmt.Println("this name is already used")
+			fmt.Println("login_out signup, this name is already used")
 		} else if newUserName != newPwd && newEmail != newPwd {
 			// If all checks pass, create a new user entry in the database.
 			userToAdd.email = newEmail
 			userToAdd.username = newUserName
 			userToAdd.pwd, err = HashPassword(newPwd)
 			if err != nil {
-				fmt.Println("login_out signup error hashing password during registration")
+				fmt.Println("login_out signup, error hashing password during registration :", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
@@ -305,12 +305,12 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/account", http.StatusSeeOther)
 				return
 			} else {
-				fmt.Println("login_out signup error in adduser")
+				fmt.Println("login_out signup, error in adduser", err)
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
 		} else {
-			fmt.Println("you can't take your username as your password")
+			fmt.Println("login_out signup, you can't take your username as your password")
 		}
 	}
 	// Execute the registration page template.
@@ -372,14 +372,14 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, cookieUuid)
 			uid = cookieUuid
 		} else {
-			fmt.Println("login_out delete Error retrieving cookie 'UUID':", err)
+			fmt.Println("login_out delete, Error retrieving cookie 'UUID' :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
 	}
 	_, err = db.Exec("DELETE FROM user WHERE uuid=?", uid.Value)
 	if err != nil {
-		fmt.Println("login_out delete Error deleting user:", err)
+		fmt.Println("login_out delete, Error deleting user :", err)
 	}
 	Logout(w, r) // logout of the user
 }

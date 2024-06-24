@@ -80,11 +80,11 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 	uid, err := r.Cookie("UUID")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			fmt.Println("profile createProfile cookie not found ")
+			fmt.Println("profile createProfile, cookie not found")
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println("profile createProfile Error retrieving cookie UUID:", err)
+		fmt.Println("profile createProfile, Error retrieving cookie UUID :", err)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -94,11 +94,11 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 	err1 := db.QueryRow("SELECT username FROM user WHERE uuid=?", uid.Value).Scan(&username)
 	if err1 != nil {
 		if err1 == sql.ErrNoRows {
-			fmt.Println("profile createProfile sql:", err1)
+			fmt.Println("profile createProfile, sql :", err1)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
-		fmt.Println("profile createprofile error scan :", err1)
+		fmt.Println("profile createprofile, error scan :", err1)
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
@@ -116,7 +116,7 @@ func createProfile(w http.ResponseWriter, r *http.Request) {
 		// Prepare and execute the SQL statement to insert the new profile
 		statement, err := db.Prepare("INSERT INTO profile(uuid, username, profilepicture) VALUES(?, ?, ?)")
 		if err != nil {
-			fmt.Println("profile createProfile error Prepare new profile:", err)
+			fmt.Println("profile createProfile, error Prepare new profile :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}

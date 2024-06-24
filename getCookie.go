@@ -56,11 +56,11 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		lastUsername, err := r.Cookie("LastUsername")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				fmt.Println("cookie not found LastUsername") // The "LastUsername" cookie is not found.
+				fmt.Println("GetCookie GetCookie cookie not found LastUsername") // The "LastUsername" cookie is not found.
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("Error retrieving cookie LastUsername:", err) // Error retrieving the "LastUsername" cookie.
+			fmt.Println("GetCookie GetCookie Error retrieving cookie LastUsername :", err) // Error retrieving the "LastUsername" cookie.
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -69,11 +69,11 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		lastChanel, err := r.Cookie("LastChanel")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				fmt.Println("cookie not found LastChanel") // The "LastChanel" cookie is not found.
+				fmt.Println("GetCookie GetCookie cookie not found LastChanel") // The "LastChanel" cookie is not found.
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("Error retrieving cookie LastChanel:", err) // Error retrieving the "LastChanel" cookie.
+			fmt.Println("GetCookie GetCookie Error retrieving cookie LastChanel :", err) // Error retrieving the "LastChanel" cookie.
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -82,11 +82,11 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		uid, err := r.Cookie("UUID")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				fmt.Println("cookie not found userpost") // The "UUID" cookie is not found.
+				fmt.Println("GetCookie GetCookie cookie not found userpost") // The "UUID" cookie is not found.
 				http.Redirect(w, r, "/500", http.StatusSeeOther)
 				return
 			}
-			fmt.Println("Error retrieving cookie uuid:", err) // Error retrieving the "UUID" cookie.
+			fmt.Println("GetCookie GetCookie Error retrieving cookie uuid :", err) // Error retrieving the "UUID" cookie.
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return
 		}
@@ -98,7 +98,7 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 	// Load and execute the homepage template with the obtained posts.
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
 	if err := openpage.Execute(w, posts); err != nil {
-		fmt.Println("error executing template:", err) // Error executing the template.
+		fmt.Println("GetCookie GetCookie error executing template :", err) // Error executing the template.
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return
 	}
