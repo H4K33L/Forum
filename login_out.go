@@ -27,8 +27,6 @@ type allStruct struct {
 	Posts   []Post
 }
 
-var AllStruct allStruct
-
 /*
 Accueil(w, r)
 
