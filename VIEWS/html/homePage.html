@@ -14,12 +14,6 @@
             <div class="logo">
                 <img src="../static/stylsheet/IMAGES/KitsuneGrand.png" alt="Logo">
             </div>
-
-            <aside class="marge-elements">
-                <div class="bloc-element"> </div>
-                <div class="bloc-element"> </div>
-            </aside>
-
         </div>
 
 
@@ -49,91 +43,93 @@
                 <div class="sign">+</div>
                 <div class="text">Post</div>
             </button>
-            <content>
+            <content class="posts">
                 {{range .Posts}}
-                    <h1>{{ .Username }}</h1>
-                    <p>{{ .Date }}</p>
-                        {{if eq .TypeDoc "image"}}
-                            <img src="{{ .Document }}" >
-                        {{else if eq .TypeDoc "video"}}
-                            {{if eq .Ext "file"}}
-                                <video src="{{.Document}}" controls ></video>
-                            {{else}}
-                                <a href="{{.Document}}">{{.Document}}</a>
+                    <div class="post-box">
+                        <h1>{{ .Username }}</h1>
+                        <p>{{ .Date }}</p>
+                            {{if eq .TypeDoc "image"}}
+                                <img src="{{ .Document }}" >
+                            {{else if eq .TypeDoc "video"}}
+                                {{if eq .Ext "file"}}
+                                    <video src="{{.Document}}" controls ></video>
+                                {{else}}
+                                    <a href="{{.Document}}">{{.Document}}</a>
+                                {{end}}
                             {{end}}
-                        {{end}}
-                        <h3>{{ .Message }}</h3>
-                        <p>like : {{.Like}}</p>
-                        <form method="POST">
-                            <select name="like">
-                                <option value="{{.ID}}"></option>
-                            </select>
-                            {{ if .IsUserLikePost }}
-                                <input type="submit" style="color:blue;"><img src="" alt=""></input>
-                            {{ else }}
-                                <input type="submit" ><img src="" alt=""></input>
-                            {{ end }}
-                        </form>
-                        <p>dislike : {{.Dislike}}</p>
-                        <form method="POST">
-                            <select name="dislike">
-                                <option value="{{.ID}}"></option>
-                            </select>
-                            {{ if .IsUserDislikePost }}
-                            <input type="submit" style="color:red;"><img src="" alt=""></input>
-                            {{ else }}
-                                <input type="submit" ><img src="" alt=""></input>
-                            {{ end }}
-                        </form>
+                            <h3>{{ .Message }}</h3>
+                            <p>like : {{.Like}}</p>
+                            <form method="POST">
+                                <select name="like">
+                                    <option value="{{.ID}}"></option>
+                                </select>
+                                {{ if .IsUserLikePost }}
+                                    <input type="submit" style="color:blue;"><img src="" alt=""></input>
+                                {{ else }}
+                                    <input type="submit" ><img src="" alt=""></input>
+                                {{ end }}
+                            </form>
+                            <p>dislike : {{.Dislike}}</p>
+                            <form method="POST">
+                                <select name="dislike">
+                                    <option value="{{.ID}}"></option>
+                                </select>
+                                {{ if .IsUserDislikePost }}
+                                <input type="submit" style="color:red;"><img src="" alt=""></input>
+                                {{ else }}
+                                    <input type="submit" ><img src="" alt=""></input>
+                                {{ end }}
+                            </form>
                         <!-- a aficher sur bouton déroulant et si l'utilisateur est l'auteur des posts -->
-                        {{if .IsUserMadePost}}
-                            <button class="edit" id="Edit">EDIT</button>
-                            <article class="contentEdit" id="contentedit">
+                            {{if .IsUserMadePost}}
+                                <button class="edit" id="Edit">EDIT</button>
+                                <article class="contentEdit" id="contentedit">
                                 
-                                <form method="POST">
-                                    <select name="ToEditID">
-                                        <option value="{{.ID}}"></option>
-                                    </select>
-                                    <input type="text" name="messageEdit" autofocus placeholder="Entrez votre message">
-                                    <article class="typeEdit">
-                                        <div>
-                                            <input type="radio" id="file" name="type" value="nothing" checked />
-                                            <label for="nothing">nothing</label>
-                                        </div>
-                                        <div>
-                                            <input type="radio" id="url" name="type" value="image" />
-                                            <label for="image">image</label>
-                                        </div>
-                                        <div>
-                                            <input type="radio" id="file" name="type" value="video" checked />
-                                            <label for="video">video</label>
-                                        </div>
-                                    </article>
+                                    <form method="POST">
+                                        <select name="ToEditID">
+                                            <option value="{{.ID}}"></option>
+                                        </select>
+                                        <input type="text" name="messageEdit" autofocus placeholder="Entrez votre message">
+                                        <article class="typeEdit">
+                                            <div>
+                                                <input type="radio" id="file" name="type" value="nothing" checked />
+                                                <label for="nothing">nothing</label>
+                                            </div>
+                                            <div>
+                                                <input type="radio" id="url" name="type" value="image" />
+                                                <label for="image">image</label>
+                                            </div>
+                                            <div>
+                                                <input type="radio" id="file" name="type" value="video" checked />
+                                                <label for="video">video</label>
+                                            </div>
+                                        </article>
                                     
-                                    <article class="typedocEdit">
-                                        <div>
-                                            <input type="radio" id="url" name="typedoc" value="url" />
-                                            <label for="url">url</label>
-                                        </div>
-                                        <div>
-                                            <input type="radio" id="file" name="typedoc" value="file" checked />
-                                            <label for="file">file</label>
-                                        </div>
-                                    </article>
-                                    <input type="file" name="imageFileEdit" id="fileEdit">
-                                    <input type="url" name="imageEdit" autofocus placeholder="Placez ici l'URL de l'image" id="urlEdit">
-                                    <input type="text" name="chanelEdit" autofocus placeholder="Placez ici le canal où vous voulez poster">
-                                    <input type="text" name="targetEdit" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
-                                    <input type="submit"value="EDIT">
-                                </form>
-                                <form method="POST">
-                                    <select name="ToDelID">
-                                        <option value="{{.ID}}"></option>
-                                    </select>
-                                    <button type="submit">🗑</button>
-                                </form>
-                            </article>
-                        {{ end }}
+                                        <article class="typedocEdit">
+                                            <div>
+                                                <input type="radio" id="url" name="typedoc" value="url" />
+                                                <label for="url">url</label>
+                                            </div>
+                                            <div>
+                                                <input type="radio" id="file" name="typedoc" value="file" checked />
+                                                <label for="file">file</label>
+                                            </div>
+                                        </article>
+                                        <input type="file" name="imageFileEdit" id="fileEdit">
+                                        <input type="url" name="imageEdit" autofocus placeholder="Placez ici l'URL de l'image" id="urlEdit">
+                                        <input type="text" name="chanelEdit" autofocus placeholder="Placez ici le canal où vous voulez poster">
+                                        <input type="text" name="targetEdit" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+                                        <input type="submit"value="EDIT">
+                                    </form>
+                                    <form method="POST">
+                                        <select name="ToDelID">
+                                            <option value="{{.ID}}"></option>
+                                        </select>
+                                        <button type="submit">🗑</button>
+                                    </form>
+                                </article>
+                            {{ end }}
+                    </div>
                 {{ end }}
             </content>
         </div>

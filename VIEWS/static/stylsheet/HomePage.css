@@ -13,14 +13,14 @@ html, body {
 /* Grid container styles */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(1, 1fr);
     height: 100vh;
     grid-template-areas: 
-        "a b b b"
-        "a c c c"
-        "a c c c"
-        "a c c c";
+        "a"
+        "b"
+        "c"
+        "c";
 }
 
 /* Grid items */
@@ -47,37 +47,6 @@ select{
     position: sticky;
 }
 
-aside {
-    background-color: darkgray;
-    padding: 20px;
-    width: 250px;
-    height: 600px;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.marge-elements {
-    background-color: darkgray;
-    padding: 20px;
-    width: 100%;
-    height: 600px;
-    align-items: center;
-    justify-content: center;
-    place-self: center;
-    display: grid;
-}
-
-.bloc-element {
-    background-color: white;
-    padding: 15px;
-    width: 300px;
-    height: 250px;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 15px;
-    margin: 10px;
-}
-
 .grid-item.b {
     grid-area: b;
     background-color: darkgrey;
@@ -88,8 +57,9 @@ aside {
 }
 
 .inner-container {
-    display: flex;
     align-items: center;
+    display: flex;
+    flex-direction: column;
     justify-content: flex-end;
     width: 100%;
     gap: 50px;
@@ -103,7 +73,7 @@ aside {
 }
 
 .group {
-    width: 400px;
+    width: 350px;
     display: flex;
 }
 
@@ -120,7 +90,21 @@ aside {
     width: 200px;
 }
 
+.posts {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+}
 
+.post-box {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FF6440;
+    border-radius: 5%;
+    padding: 5%;
+}
 
 .input {
     width: 100%;
@@ -423,6 +407,9 @@ label {
 
 .searchform{
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .inner-container{
@@ -431,3 +418,24 @@ label {
     justify-content: center;
 }
 
+/* ________________________________________________________________________________Version pour PC ______________________________________________________________________________*/
+@media (min-width: 467px) {
+    /* Grid container styles */
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        height: 100vh;
+        grid-template-areas: 
+            "a b b b"
+            "c c c c"
+            "c c c c"
+            "c c c c";
+    }
+    .inner-container {
+        flex-direction: row;
+    }
+    .searchform{
+        display: flex;
+    }
+}
