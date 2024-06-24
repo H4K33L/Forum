@@ -9,43 +9,47 @@
 </head>
 
 <body>
-    <div class="grid-container">
-        <div class="grid-item a">
-            <div class="logo">
+    <section class="grid-container">
+        <article class="grid-item a">
+            <span class="logo">
                 <img src="../static/stylsheet/IMAGES/KitsuneGrand.png" alt="Logo">
-            </div>
-        </div>
+            </span>
+            <aside class="marge-elements">
+                <span class="bloc-element"> </span>
+                <span class="bloc-element"> </span>
+            </aside>
+        </article>
 
 
-        <div class="grid-item b">
-            <div class="inner-container">
+        <article class="grid-item b">
+            <span class="inner-container">
                 <form method="GET"  class="searchform">
-                    <div class="group">
+                    <span class="group">
                         <input type="text" name="chanels" autofocus placeholder="Entrer un channel" class="input">
-                    </div>
-                    <div class="group2">
+                    </span>
+                    <span class="group2">
                         <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur" class="input">
-                    </div>
+                    </span>
                     <input type="submit" value="Find Post" id="grid-itembinput">
                 </form>
 
-                <div class="profil-elements">
+                <span class="profil-elements">
                     <a href="/profile">
-                        <div class="logo">
+                        <span class="logo_user">    
                             <img id="homeAvatar" src="{{.Profile.Pp}}" alt="Profil_Avatar">
-                        </div>
+                        </span>
                     </a>
-                </div>
-            </div>
-        </div>
-        <div class="grid-item c">
+                </span>
+            </span>
+        </article>
+        <article class="grid-item c">
             <button class="Btn" onclick="openPopup()">
-                <div class="sign">+</div>
-                <div class="text">Post</div>
+                <span class="sign">+</span>
+                <span class="text">Post</span>
             </button>
             <content class="posts">
                 {{range .Posts}}
-                    <div class="post-box">
+                    <section class="post-box">
                         <h1>{{ .Username }}</h1>
                         <p>{{ .Date }}</p>
                             {{if eq .TypeDoc "image"}}
@@ -91,29 +95,29 @@
                                         </select>
                                         <input type="text" name="messageEdit" autofocus placeholder="Entrez votre message">
                                         <article class="typeEdit">
-                                            <div>
+                                            <span>
                                                 <input type="radio" id="file" name="type" value="nothing" checked />
                                                 <label for="nothing">nothing</label>
-                                            </div>
-                                            <div>
+                                            </span>
+                                            <span>
                                                 <input type="radio" id="url" name="type" value="image" />
                                                 <label for="image">image</label>
-                                            </div>
-                                            <div>
+                                            </span>
+                                            <span>
                                                 <input type="radio" id="file" name="type" value="video" checked />
                                                 <label for="video">video</label>
-                                            </div>
+                                            </span>
                                         </article>
                                     
                                         <article class="typedocEdit">
-                                            <div>
+                                            <span>
                                                 <input type="radio" id="url" name="typedoc" value="url" />
                                                 <label for="url">url</label>
-                                            </div>
-                                            <div>
+                                            </span>
+                                            <span>
                                                 <input type="radio" id="file" name="typedoc" value="file" checked />
                                                 <label for="file">file</label>
-                                            </div>
+                                            </span>
                                         </article>
                                         <input type="file" name="imageFileEdit" id="fileEdit">
                                         <input type="url" name="imageEdit" autofocus placeholder="Placez ici l'URL de l'image" id="urlEdit">
@@ -129,41 +133,41 @@
                                     </form>
                                 </article>
                             {{ end }}
-                    </div>
+                    </section>
                 {{ end }}
             </content>
-        </div>
+        </section>
 
-        <div id="postPopup" class="popup">
-            <div class="popup-content">
+        <section id="postPopup" class="popup">
+            <article class="popup-content">
                 <span class="close" onclick="closePopup()">&times;</span>
                 <h2>Créer un post</h2>
                 <form method="POST" enctype="multipart/form-data">
                     <input type="text" name="message" required autofocus placeholder="Entrez votre message">
                     <article class="type">
-                        <div>
+                        <span>
                             <input type="radio" id="file" name="type" value="nothing" checked />
                             <label for="nothing">nothing</label>
-                        </div>
-                        <div>
+                        </span>
+                        <span>
                             <input type="radio" id="url" name="type" value="image" />
                             <label for="image">image</label>
-                        </div>
-                        <div>
+                        </span>
+                        <span>
                             <input type="radio" id="file" name="type" value="video" checked />
                             <label for="video">video</label>
-                        </div>
+                        </span>
                     </article>
 
                     <article class="typedoc">
-                        <div>
+                        <span>
                             <input type="radio" id="url" name="typedoc" value="url" />
                             <label for="url">url</label>
-                        </div>
-                        <div>
+                        </span>
+                        <span>
                             <input type="radio" id="file" name="typedoc" value="file" checked />
                             <label for="file">file</label>
-                        </div>
+                        </span>
                     </article>
                     <input type="file" name="documentFile" id="filepost">
                     <input type="url" name="document" autofocus placeholder="Placez ici l'URL de l'image" id="urlpost">
@@ -174,8 +178,8 @@
                 </form>
 
                 
-            </div>
-        </div>
+            </article>
+        </section>
 
         <script src="../static/js/HomePage.js"></script>
 
