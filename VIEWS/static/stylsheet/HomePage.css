@@ -406,7 +406,10 @@ label {
     }
 }
 
-
+a{
+    text-decoration: none;
+    color: white;
+}
 
 .inner-container{
     display: flex;
@@ -439,7 +442,7 @@ label {
         padding: 20px;
         width: 250px;
         height: 600px;
-        align-items: center;    
+        align-items: center;
         justify-content: space-between;
     }
     .marge-elements {

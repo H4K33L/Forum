@@ -9,29 +9,36 @@
 </head>
 
 <body>
-    <div class="grid-container">
-        <div class="grid-item a">
-            <div class="logo">
+    <section class="grid-container">
+        <article class="grid-item a">
+            <span class="logo">
                 <img src="../static/stylsheet/IMAGES/KitsuneGrand.png" alt="Logo">
-            </div>
-
+            </span>
             <aside class="marge-elements">
-                <div class="bloc-element"> </div>
-                <div class="bloc-element"> </div>
+                <span class="bloc-element"> 
+
+                </span>
+                <span class="bloc-element"> 
+                    <section class="button">
+                        <a href="/confidential">RGPD</a>
+                    </section>
+                    <section class="button">
+                        <a href="/about">about</a>
+                    </section>
+                </span>
             </aside>
+        </article>
 
-        </div>
 
-        
-        <div class="grid-item b">
-            <div class="inner-container">
+        <article class="grid-item b">
+            <span class="inner-container">
                 <form method="GET"  class="searchform">
-                    <div class="group">
+                    <span class="group">
                         <input type="text" name="chanels" autofocus placeholder="Entrer un channel" class="input">
-                    </div>
-                    <div class="group2">
+                    </span>
+                    <span class="group2">
                         <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur" class="input">
-                    </div>
+                    </span>
                     <input type="submit" value="Find Post" id="grid-itembinput">
                 </form>
                 <a style="--clr: #7808d0" class="button" href="/login">
@@ -52,16 +59,18 @@
                     </span>
                     Connexion
                 </a>
-                <div class="profil-elements">
-                    <a href="/login">
-                        <div class="logo">
-                            <img id="homeAvatar" src="../static/stylsheet/IMAGES/PP/Avatar.jpg" alt="Profil_Avatar">
-                        </div>
+                <span class="profil-elements">
+                    <a href="/profile">
+                        <span class="logo_user">    
+                            <img id="homeAvatar" src="{{.Profile.Pp}}" alt="Profil_Avatar">
+                        </span>
                     </a>
-                </div>
-            </div>
-        </div>
-        <div class="grid-item c">
-        </div>
+                </span>
+            </span>
+        </article>
+        <article class="grid-item c">
+        </article>
 </body>
 </html>
+
+    

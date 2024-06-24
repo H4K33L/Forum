@@ -38,6 +38,9 @@ func main() {
 	http.HandleFunc("/signup", client.Signup)
 	http.HandleFunc("/login", client.Login)
 
+	http.HandleFunc("/confidential", client.Confidential)
+	http.HandleFunc("/about", client.About)
+
 	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
 		client.Account(w, r)
 		client.UserPost(w, r)
