@@ -27,7 +27,18 @@ html, body {
 .grid-item {
     font-size: 24px;
 }
-
+#grid-itembinput{
+    display: none;
+}
+#urlpost{
+    display: none;
+}
+select{
+    display: none;
+}
+#contentedit{
+    display:none ;
+}
 .grid-item.a {
     grid-area: a;
     background-color: darkgrey;

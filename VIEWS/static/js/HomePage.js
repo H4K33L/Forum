@@ -43,3 +43,12 @@ document.querySelector("article.typedoc").addEventListener("click", function(evt
       }
     }
   });
+
+  document.getElementById("Edit").addEventListener("click", function() {
+    var contentEdit = document.getElementById("contentedit");
+    if (contentEdit.style.display === "none" || contentEdit.style.display === "") {
+        contentEdit.style.display = "block";
+    } else {
+        contentEdit.style.display = "none";
+    }
+});

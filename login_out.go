@@ -48,7 +48,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Parse the HTML template named "accueil.html".
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/home.html"))
 
 	// Execute the parsed template, passing any necessary data (users) to it.
 	openpage.Execute(w, users) // The 'users' variable is referenced but not defined.

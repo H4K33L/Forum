@@ -127,9 +127,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 								path := "/static/stylsheet/IMAGES/POST/" + post.PostUuid + ext
 								// Check if the file already exists and remove it
 								if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-									fmt.Println("post userpost no extension os.error :", err)
-									http.Redirect(w, r, "/500", http.StatusSeeOther)
-									return
+									//do nothing
 								} else {
 									err = os.Remove("./VIEWS" + path)
 									if err != nil {
@@ -197,9 +195,7 @@ func UserPost(w http.ResponseWriter, r *http.Request) {
 								path := "/static/stylsheet/VIDEO/" + post.PostUuid + ext
 								// Check if the file already exists and remove it
 								if _, err := os.Stat("./VIEWS" + path); errors.Is(err, os.ErrNotExist) {
-									fmt.Println("post userpost no extention video :", err)
-									http.Redirect(w, r, "/500", http.StatusSeeOther)
-									return
+									//do nothing
 								} else {
 									err = os.Remove("./VIEWS" + path)
 									if err != nil {
