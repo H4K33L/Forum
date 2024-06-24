@@ -1,6 +1,7 @@
 package client
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -21,11 +22,11 @@ r *http.Request
 output : none
 */
 func GetCookie(w http.ResponseWriter, r *http.Request) {
+
+	var AllStruct allStruct
 	// Open a connection to the database and ensure it is closed at the end of the function.
 	db := OpenDb("./DATA/User_data.db", w, r)
 	defer db.Close()
-
-	var posts []Post
 
 	// If posts are available for the current request
 	if GetPost(w, r) != nil {
@@ -50,7 +51,7 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, requestPostChanel)
 
 		// Get the posts for the current request.
-		posts = GetPost(w, r)
+		AllStruct.Posts = GetPost(w, r)
 	} else {
 		// Retrieve the "LastUsername" cookie.
 		lastUsername, err := r.Cookie("LastUsername")
@@ -92,12 +93,34 @@ func GetCookie(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Get the posts based on the last username and last channel.
-		posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid,w,r)
-	}
+		AllStruct.Posts = GetPostByBoth(db, lastUsername.Value, lastChanel.Value, uid, w, r)
 
+	}
+	uid, err := r.Cookie("UUID")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			fmt.Println("GetCookie GetCookie cookie not found userpost") // The "UUID" cookie is not found.
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
+		}
+		fmt.Println("GetCookie GetCookie Error retrieving cookie uuid :", err) // Error retrieving the "UUID" cookie.
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
+	err1 := db.QueryRow("SELECT uuid,username,profilepicture FROM profile WHERE uuid=?", uid.Value).Scan(&AllStruct.Profile.Uid, &AllStruct.Profile.Username, &AllStruct.Profile.Pp)
+	if err1 != nil {
+		if err1 == sql.ErrNoRows {
+			fmt.Println("profile profile sql :", err1)
+			http.Redirect(w, r, "/500", http.StatusSeeOther)
+			return
+		}
+		fmt.Println("profile profile error scan :", err1)
+		http.Redirect(w, r, "/500", http.StatusSeeOther)
+		return
+	}
 	// Load and execute the homepage template with the obtained posts.
 	openpage := template.Must(template.ParseFiles("./VIEWS/html/homePage.html"))
-	if err := openpage.Execute(w, posts); err != nil {
+	if err := openpage.Execute(w, AllStruct); err != nil {
 		fmt.Println("GetCookie GetCookie error executing template :", err) // Error executing the template.
 		http.Redirect(w, r, "/500", http.StatusSeeOther)
 		return

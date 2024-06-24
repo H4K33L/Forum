@@ -22,6 +22,11 @@ type user struct {
 
 var users user
 
+type allStruct struct {
+	Profile profile
+	Posts   []Post
+}
+
 /*
 Accueil(w, r)
 
@@ -43,7 +48,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Parse the HTML template named "accueil.html".
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/accueil.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/home.html"))
 
 	// Execute the parsed template, passing any necessary data (users) to it.
 	openpage.Execute(w, users) // The 'users' variable is referenced but not defined.
@@ -126,7 +131,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Parse the HTML template for the login page.
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/connexion.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/login.html"))
 
 	// Initialize a user struct to store login information.
 	var userconnect user
@@ -243,7 +248,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Parse the HTML template for the registration page.
-	openpage := template.Must(template.ParseFiles("./VIEWS/html/inscription.html"))
+	openpage := template.Must(template.ParseFiles("./VIEWS/html/signup.html"))
 
 	// Initialize a user struct to store registration information.
 	var userToAdd user

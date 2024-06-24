@@ -27,41 +27,18 @@
             <div class="inner-container">
                 <form method="GET"  class="searchform">
                     <div class="group">
-                
                         <input type="text" name="chanels" autofocus placeholder="Entrer un channel" class="input">
                     </div>
-
                     <div class="group2">
-             
-                        <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur"
-                            class="input">
+                        <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur" class="input">
                     </div>
+                    <input type="submit" value="Find Post" id="grid-itembinput">
                 </form>
 
-
-                <a style="--clr: #7808d0" class="button" href="#">
-                    <span class="button__icon-wrapper">
-                        <svg width="10" class="button__icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 14 15">
-                            <path fill="currentColor"
-                                d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z">
-                            </path>
-                        </svg>
-
-                        <svg class="button__icon-svg  button__icon-svg--copy" xmlns="http://www.w3.org/2000/svg"
-                            width="10" fill="none" viewBox="0 0 14 15">
-                            <path fill="currentColor"
-                                d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z">
-                            </path>
-                        </svg>
-                    </span>
-                    Connexion
-                </a>
-
                 <div class="profil-elements">
-                    <a href="profil.html">
+                    <a href="/profile">
                         <div class="logo">
-                            <img id="homeAvatar" src="../static/stylsheet/IMAGES/PP/Avatar.jpg" alt="Profil_Avatar">
+                            <img id="homeAvatar" src="{{.Profile.Pp}}" alt="Profil_Avatar">
                         </div>
                     </a>
                 </div>
@@ -72,8 +49,93 @@
                 <div class="sign">+</div>
                 <div class="text">Post</div>
             </button>
-
-
+            <content>
+                {{range .Posts}}
+                    <h1>{{ .Username }}</h1>
+                    <p>{{ .Date }}</p>
+                        {{if eq .TypeDoc "image"}}
+                            <img src="{{ .Document }}" >
+                        {{else if eq .TypeDoc "video"}}
+                            {{if eq .Ext "file"}}
+                                <video src="{{.Document}}" controls ></video>
+                            {{else}}
+                                <a href="{{.Document}}">{{.Document}}</a>
+                            {{end}}
+                        {{end}}
+                        <h3>{{ .Message }}</h3>
+                        <p>like : {{.Like}}</p>
+                        <form method="POST">
+                            <select name="like">
+                                <option value="{{.ID}}"></option>
+                            </select>
+                            {{ if .IsUserLikePost }}
+                                <input type="submit" style="color:blue;"><img src="" alt=""></input>
+                            {{ else }}
+                                <input type="submit" ><img src="" alt=""></input>
+                            {{ end }}
+                        </form>
+                        <p>dislike : {{.Dislike}}</p>
+                        <form method="POST">
+                            <select name="dislike">
+                                <option value="{{.ID}}"></option>
+                            </select>
+                            {{ if .IsUserDislikePost }}
+                            <input type="submit" style="color:red;"><img src="" alt=""></input>
+                            {{ else }}
+                                <input type="submit" ><img src="" alt=""></input>
+                            {{ end }}
+                        </form>
+                        <!-- a aficher sur bouton déroulant et si l'utilisateur est l'auteur des posts -->
+                        {{if .IsUserMadePost}}
+                            <button class="edit" id="Edit">EDIT</button>
+                            <article class="contentEdit" id="contentedit">
+                                
+                                <form method="POST">
+                                    <select name="ToEditID">
+                                        <option value="{{.ID}}"></option>
+                                    </select>
+                                    <input type="text" name="messageEdit" autofocus placeholder="Entrez votre message">
+                                    <article class="typeEdit">
+                                        <div>
+                                            <input type="radio" id="file" name="type" value="nothing" checked />
+                                            <label for="nothing">nothing</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="url" name="type" value="image" />
+                                            <label for="image">image</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="file" name="type" value="video" checked />
+                                            <label for="video">video</label>
+                                        </div>
+                                    </article>
+                                    
+                                    <article class="typedocEdit">
+                                        <div>
+                                            <input type="radio" id="url" name="typedoc" value="url" />
+                                            <label for="url">url</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="file" name="typedoc" value="file" checked />
+                                            <label for="file">file</label>
+                                        </div>
+                                    </article>
+                                    <input type="file" name="imageFileEdit" id="fileEdit">
+                                    <input type="url" name="imageEdit" autofocus placeholder="Placez ici l'URL de l'image" id="urlEdit">
+                                    <input type="text" name="chanelEdit" autofocus placeholder="Placez ici le canal où vous voulez poster">
+                                    <input type="text" name="targetEdit" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+                                    <input type="submit"value="EDIT">
+                                </form>
+                                <form method="POST">
+                                    <select name="ToDelID">
+                                        <option value="{{.ID}}"></option>
+                                    </select>
+                                    <button type="submit">🗑</button>
+                                </form>
+                            </article>
+                        {{ end }}
+                {{ end }}
+            </content>
         </div>
 
         <div id="postPopup" class="popup">
@@ -111,11 +173,11 @@
                     <input type="url" name="document" autofocus placeholder="Placez ici l'URL de l'image" id="urlpost">
                     <input type="text" name="chanel" required autofocus
                         placeholder="Placez ici le canal où vous voulez poster">
-                    <input type="text" name="target" autofocus
-                        placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+                    <input type="text" name="target" autofocus placeholder="Spécifiez ici tout utilisateur que vous voulez mentionner, séparez chaque utilisateur par '\\'">
+                    <button onclick="createPost()">Publier</button>
                 </form>
 
-                <button onclick="createPost()">Publier</button>
+                
             </div>
         </div>
 

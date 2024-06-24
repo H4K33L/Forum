@@ -66,7 +66,7 @@ func getPostByUser(db *sql.DB, username string, uid *http.Cookie, w http.Respons
 		var post Post
 		var chanel string
 		var target string
-		if err := UserPost.Scan(&post.ID, &post.Uuid, &post.Username, &post.Message, &post.Document, &post.Date, &chanel, &target, &post.Like, &post.Dislike); err != nil {
+		if err := UserPost.Scan(&post.ID, &post.Uuid, &post.PostUuid, &post.Username, &post.Message, &post.Document, &post.Ext, &post.TypeDoc, &post.Date, &chanel, &target, &post.Like, &post.Dislike); err != nil {
 			fmt.Println("getpostt getPostByUser, error in reading :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return nil
@@ -222,9 +222,8 @@ func getPostByID(db *sql.DB, ID string, w http.ResponseWriter, r *http.Request) 
 	for UserPost.Next() {
 		var chanel string
 		var target string
-		var answers string
 		// Scan the query results into the output struct
-		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.Username, &output.Message, &output.Document, &output.Date, &chanel, &target, &answers, &output.Like, &output.Dislike); err != nil {
+		if err := UserPost.Scan(&output.ID, &output.Uuid, &output.PostUuid, &output.Username, &output.Message, &output.Document, &output.Ext, &output.TypeDoc, &output.Date, &chanel, &target, &output.Like, &output.Dislike); err != nil {
 			fmt.Println("getPost getPostByID, error in reading :", err)
 			http.Redirect(w, r, "/500", http.StatusSeeOther)
 			return output
