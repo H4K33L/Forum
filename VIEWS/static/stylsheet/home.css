@@ -1,0 +1,252 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0%;
+    padding: 0%;
+}
+
+header {
+    background-color:darkgray;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    width: 135px;
+    height: 135px; /* Ajout de la hauteur pour maintenir le logo rond */
+    margin-right: 20px;
+    overflow: hidden; /* Pour cacher les parties dépassantes de l'image */
+    border-radius: 50%; /* Pour rendre le logo rond */
+  }
+  
+  .logo img {
+    width: 100%;
+    height: 100%; /* Ajustement de la hauteur pour s'adapter au conteneur */
+    object-fit: cover; /* Pour s'assurer que l'image couvre entièrement le conteneur */
+  }
+
+.left-elements, .right-elements {
+    display: flex;
+    align-items: center;
+}
+  .group {
+      display: flex;
+      line-height: 28px;
+      align-items: center;
+      position: relative;
+      max-width: 190px;
+    }
+    
+    .input {
+      width: 100%;
+      height: 40px;
+      line-height: 28px;
+      padding: 0 1rem;
+      padding-left: 2.5rem;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      outline: none;
+      background-color: #f3f3f4;
+      color: #0d0c22;
+      transition: .3s ease;
+    }
+    
+    .input::placeholder {
+      color: #9e9ea7;
+    }
+    
+    .input:focus, input:hover {
+      outline: none;
+      border-color: #FF6440;
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+    }
+    
+    .icon {
+      position: absolute;
+      left: 1rem;
+      fill: #9e9ea7;
+      width: 1rem;
+      height: 1rem;
+    }   
+
+.profil-elements img{
+    width: 70px;
+}
+.logo {
+    width: 100px;
+    height: 100px; /* Ajout de la hauteur pour maintenir le logo rond */
+    margin-right: 20px;
+    overflow: hidden; /* Pour cacher les parties dépassantes de l'image */
+    border-radius: 50%; /* Pour rendre le logo rond */
+  }
+  
+  .logo img {
+    width: 100%;
+    height: 100%; /* Ajustement de la hauteur pour s'adapter au conteneur */
+    object-fit: cover; /* Pour s'assurer que l'image couvre entièrement le conteneur */
+  }
+
+.left-elements h1 {
+    margin-left: 350px;
+    color: #FF6440; 
+}
+
+.button {
+    line-height: 1;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    background-color: #FF6440;
+    color: #fff;
+    border-radius: 10rem;
+    font-weight: 600;
+    padding: .75rem 1.5rem;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color .3s;
+    margin-left: 850px;
+  }
+  
+  .button__icon-wrapper {
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    color: #FF6440;
+    background-color: #fff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  
+  .button:hover {
+    background-color: #FF6440;
+  }
+  
+  .button:hover .button__icon-wrapper {
+    color: #FF6440;
+  }
+  
+  .button__icon-svg--copy {
+    position: absolute;
+    transform: translate(-150%, 150%);
+  }
+  
+  .button:hover .button__icon-svg:first-child {
+    transition: transform .3s ease-in-out;
+    transform: translate(150%, -150%);
+  }
+  
+  .button:hover .button__icon-svg--copy {
+    transition: transform .3s ease-in-out .1s;
+    transform: translate(0);
+  } 
+
+  .content{
+    display: flex;
+  }
+
+aside {
+    width: 250px;
+    align-items: center;
+    justify-content: space-between;
+}
+.marge-elements {
+    background-color: darkgray;
+    padding: 20px;
+    height: 600px;
+    display: grid;
+    place-self: center;
+}
+.bloc-element {
+    background-color: white;
+    padding: 15px;
+    width: 200px;
+    height: 250px;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 15px;
+    margin: 10px;
+}
+.posts-elements {
+    background-color: white;
+    padding: 15px;
+    width: 1500px;
+    height: 600px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px;
+}
+
+/* Style des champs de saisie */
+input[type="text"],
+input[type="url"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Style du bouton */
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #FF6440;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #FF6440;
+}
+
+/* Style du contenu */
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Style des éléments dans la boucle */
+.content p,
+.content h3 {
+    margin: 5px 0;
+}
+
+/* Style des images */
+.content img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+/* Style des formulaires imbriqués */
+.content form {
+    display: flex;
+    align-items: center;
+}
+
+/* Style des sélecteurs */
+.content select {
+    margin-right: 10px;
+}
+
+/* Style des icônes */
+content input[type="submit"] img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    vertical-align: middle;
+}

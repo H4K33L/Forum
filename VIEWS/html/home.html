@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitsune</title>
+    <link rel="stylesheet" href="../static/stylsheet/HomePage.css">
+</head>
+
+<body>
+    <div class="grid-container">
+        <div class="grid-item a">
+            <div class="logo">
+                <img src="../static/stylsheet/IMAGES/KitsuneGrand.png" alt="Logo">
+            </div>
+
+            <aside class="marge-elements">
+                <div class="bloc-element"> </div>
+                <div class="bloc-element"> </div>
+            </aside>
+
+        </div>
+
+        
+        <div class="grid-item b">
+            <div class="inner-container">
+                <form method="GET"  class="searchform">
+                    <div class="group">
+                        <input type="text" name="chanels" autofocus placeholder="Entrer un channel" class="input">
+                    </div>
+                    <div class="group2">
+                        <input type="text" name="username" autofocus placeholder="Entrer un nom d'utilisateur" class="input">
+                    </div>
+                    <input type="submit" value="Find Post" id="grid-itembinput">
+                </form>
+                <a style="--clr: #7808d0" class="button" href="/login">
+                    <span class="button__icon-wrapper">
+                        <svg width="10" class="button__icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 15">
+                            <path fill="currentColor"
+                                d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z">
+                            </path>
+                        </svg>
+
+                        <svg class="button__icon-svg  button__icon-svg--copy" xmlns="http://www.w3.org/2000/svg"
+                            width="10" fill="none" viewBox="0 0 14 15">
+                            <path fill="currentColor"
+                                d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z">
+                            </path>
+                        </svg>
+                    </span>
+                    Connexion
+                </a>
+                <div class="profil-elements">
+                    <a href="/login">
+                        <div class="logo">
+                            <img id="homeAvatar" src="../static/stylsheet/IMAGES/PP/Avatar.jpg" alt="Profil_Avatar">
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="grid-item c">
+        </div>
+</body>
+</html>

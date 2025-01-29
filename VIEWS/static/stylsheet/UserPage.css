@@ -1,0 +1,296 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    height: 100vh;
+    grid-template-areas: 
+        "a b b b"
+        "a c c c"
+        "a c c c"
+        "a c c c";
+}
+
+.grid-item {
+      font-size: 24px;
+}
+
+.grid-item.a {
+    grid-area: a;
+    background-color: darkgrey;
+    align-items: center;
+    display:grid;
+    position: sticky;
+
+}
+
+aside {
+    background-color:darkgray;
+    padding: 20px;
+    width: 250px;
+    height: 600px;
+    align-items: center;
+    justify-content: space-between;
+}
+.marge-elements {
+    background-color: darkgray;
+    padding: 20px;
+    width: 100%;
+    height: 600px;
+    align-items: center;
+    justify-content: center;
+    place-self:center;
+    display:grid;
+}
+.bloc-element {
+    background-color: white;
+    padding: 15px;
+    width: 300px;
+    height: 250px;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 15px;
+    margin: 10px;
+}
+
+
+.grid-item.b {
+    grid-area: b;
+    background-color: darkgrey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+
+    
+}
+.grid-item.b.inner-container{
+      display:flex;
+  }
+
+/* Added a new inner container to center both elements */
+.inner-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    gap:50px;
+    margin: 20px;
+}
+
+/* CSS pour le champ de recherche */
+.group {
+    display: flex;
+    line-height: 28px;
+    align-items: center;
+    position: relative;
+    width: 400px;
+}   
+
+.group2 {
+    display: flex;
+    line-height: 28px;
+    align-items: center;
+    position: relative;
+    width: 200px;
+}
+   
+.input {
+    width: 100%;
+    height: 40px;
+    line-height: 28px;
+    padding: 0 1rem;
+    padding-left: 2.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    background-color: #f3f3f4;
+    color: #0d0c22;
+    transition: .3s ease;
+}
+   
+.input::placeholder {
+    color: #9e9ea7;
+}
+   
+.input:focus, input:hover {
+    outline: none;
+    border-color: #FF6440;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+}
+
+
+   
+.icon {
+    position: absolute;
+    left: 1rem;
+    fill: #9e9ea7;
+    width: 1rem;
+    height: 1rem;
+}   
+
+/* CSS pour le bouton */
+.button {
+    line-height: 1;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    background-color: #FF6440;
+    color: #fff;
+    border-radius: 10rem;
+    font-weight: 600;
+    padding: .75rem 1.5rem;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color .3s;
+    font-size:15px;
+    font-family:Arial;
+}
+
+.button__icon-wrapper {
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    color: #FF6440;
+    background-color: #fff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.button:hover {
+    background-color: #FF6440;
+}
+
+.button:hover .button__icon-wrapper {
+    color: #FF6440;
+}
+
+.button__icon-svg--copy {
+    position: absolute;
+    transform: translate(-150%, 150%);
+}
+
+.button:hover .button__icon-svg:first-child {
+    transition: transform .3s ease-in-out;
+    transform: translate(150%, -150%);
+}
+
+.button:hover .button__icon-svg--copy {
+    transition: transform .3s ease-in-out .1s;
+    transform: translate(0);
+}
+
+/* CSS pour le logo */
+.profil-elements img {
+    width: 70px;
+    border-radius: 50%;
+}
+
+.logo {
+    width: 100px;
+    height: 100px; /* Ajout de la hauteur pour maintenir le logo rond */
+    overflow: hidden;
+    border-radius: 10%;
+    margin: 20px;
+    place-self:center;
+
+}
+.logo img {
+    width: 100%;
+    height: 100%; /* Ajustement de la hauteur pour s'adapter au conteneur */
+    object-fit: cover; /* Pour s'assurer que l'image couvre entièrement le conteneur */
+    place-items: center;    
+  }
+
+  .grid-item.c {
+    grid-area: c;
+    background-color: white;
+}
+
+/* Styles pour la carte */
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #FF6440;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #FF6440;
+    margin: 15px;
+    height: 525px;
+}
+
+/* Styles pour le logo */
+.logo img {
+    max-width: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+/* Styles pour le titre de la carte */
+.card__title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.card__texte {
+    font-size: 1.0em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Styles pour le wrapper de la carte */
+.card__wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+/* Styles pour le bouton */
+.card__btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: white;
+    background-color: darkgray;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.card__btn:hover {
+    background-color: black;
+}
+
+.card__texte input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+
+

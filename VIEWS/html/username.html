@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitsune</title>
+    <link href="/static/stylsheet/subPage.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <section class="box">
+        <h1>Changer de pseudo</h1>
+        <form method="POST">
+            <input type="text" maxlength="10" name="username" required autofocus placeholder="entrer votre mot de passe actuel" class="entry">
+            <input type="text" maxlength="10" name="newUsername" required autofocus placeholder="entrer le nouveau pseudo" class="entry">
+            <input type="text" maxlength="10" name="newUsername2" required autofocus placeholder="réecriver le pseudo" class="entry">
+            <input type="submit" value="changer de pseudo" class="btn">
+        </form>
+        <section class="button">
+            <a href="/profile"><button type="button" class="btn"><span class="text">profile page</span></button></a>
+        </section>
+    </section>
+</body>
+</html>

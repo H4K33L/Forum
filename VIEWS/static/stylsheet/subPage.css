@@ -1,0 +1,143 @@
+/* ________________________________________________________________________________Version pour mobile ______________________________________________________________________________*/
+* {padding: 0; margin: 0;}
+html,body { 
+   height: 100%; 
+}
+
+body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+        circle farthest-side at 0% 50%,
+        darkgrey 23.5%,
+        rgba(255, 170, 0, 0) 0
+      )
+      21px 30px,
+    radial-gradient(
+        circle farthest-side at 0% 50%,
+        #b1b1b1 24%,
+        rgba(240, 166, 17, 0) 0
+      )
+      19px 30px,
+    linear-gradient(
+        darkgrey 14%,
+        rgba(240, 166, 17, 0) 0,
+        rgba(240, 166, 17, 0) 85%,
+        darkgrey 0
+      )
+      0 0,
+    linear-gradient(
+        150deg,
+        darkgrey 24%,
+        #b1b1b1 0,
+        #b1b1b1 26%,
+        rgba(240, 166, 17, 0) 0,
+        rgba(240, 166, 17, 0) 74%,
+        #b1b1b1 0,
+        #b1b1b1 76%,
+        darkgrey 0
+      )
+      0 0,
+    linear-gradient(
+        30deg,
+        darkgrey 24%,
+        #b1b1b1 0,
+        #b1b1b1 26%,
+        rgba(240, 166, 17, 0) 0,
+        rgba(240, 166, 17, 0) 74%,
+        #b1b1b1 0,
+        #8d8d8d 76%,
+        darkgrey 0
+      )
+      0 0,
+    linear-gradient(90deg, #b1b1b1 2%, darkgrey 0, darkgrey 98%, #b1b1b1 0%) 0 0
+      darkgrey;
+  background-size: 40px 60px;  
+}
+  
+h1{
+  text-align: center;
+  font-size:1.5em;
+  color:#525252;
+}
+
+.Kitsune, .pp{
+  width: 5em;
+  height: 5em; 
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+}
+
+.box{
+  background:white;
+  width:300px;
+  border-radius:6px;
+  margin: 0 auto 0 auto;
+  padding:0px 0px 30px 5px;
+  border: #973b26 4px solid; 
+}
+
+
+.entry{
+  background:#ecf0f1;
+  border: #ccc 1px solid;
+  border-bottom: #ccc 2px solid;
+  padding: 8px;
+  width:250px;
+  color:#FF6440;
+  margin-top:10px;
+  font-size:1em;
+  border-radius:4px;
+}
+  
+.btn {
+  background: #FF6440;
+  width: 125px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: white;
+  border-radius: 4px;
+  border: #ff2f00 1px solid;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block; 
+  font-weight: 800;
+  font-size: 0.8em;
+  text-align: center; 
+}
+  
+.btn:hover{
+  background:#ff2f00; 
+}
+
+.toggle-button{
+  padding: 3px;
+  color:#FF6440 ;
+}
+
+.toggle-button:hover{
+  color:#ff2f00;
+}
+
+a{
+  text-decoration: none;
+}
+
+/* ________________________________________________________________________________Version pour tablet ______________________________________________________________________________*/
+@media only screen and (min-width: 600px)  {
+
+}
+/* ________________________________________________________________________________Version pour PC ______________________________________________________________________________*/
+@media (min-width: 1430px) {
+    
+}
